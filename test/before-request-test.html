@@ -1,0 +1,134 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../iron-test-helpers/test-helpers.js"></script>
+    <script src="../../iron-test-helpers/mock-interactions.js"></script>
+    <link rel="import" href="../variables-evaluator.html">
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <variables-evaluator></variables-evaluator>
+      </template>
+    </test-fixture>
+
+    <script>
+    function fire(name, detail, node) {
+      var event = new CustomEvent(name, {
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+        detail: detail
+      });
+      (node || document).dispatchEvent(event);
+      return event;
+    }
+    /* global suite, test, fixture, assert */
+    suite('evaluateVariable()', function() {
+      var element;
+      var request = {
+        'url': 'https://test.com?q=${test1}',
+        'headers': 'x-test: ${test2}\nx-test2: ${test3}',
+        'method': '${test3}',
+        'payload': '${test4}',
+        'promises': []
+      };
+
+      var contextFactory = function(e) {
+        e.preventDefault();
+        e.detail.value = [{
+          variable: 'test1',
+          value: 'value1',
+          enabled: true
+        }, {
+          variable: 'test2',
+          value: 'value2 ${test1}',
+          enabled: true
+        }, {
+          variable: 'test3',
+          value: 'value3 ${test4}',
+          enabled: true
+        }, {
+          variable: 'test4',
+          value: 'value4',
+          enabled: true
+        }, {
+          variable: 'test5',
+          value: 'value5',
+          enabled: false
+        }];
+      };
+
+      suiteSetup(function() {
+        window.addEventListener('variable-list', contextFactory);
+      });
+
+      suiteTeardown(function() {
+        window.removeEventListener('variable-list', contextFactory);
+      });
+
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Should return promise', function() {
+        var event = fire('before-request', Object.assign({}, request));
+        assert.typeOf(event.detail.promises[0], 'promise');
+      });
+
+      test('Should not be cancelled', function() {
+        var event = fire('before-request', Object.assign({}, request));
+        assert.isFalse(event.defaultPrevented);
+      });
+
+      test('Should evaluate URL', function() {
+        var event = fire('before-request', Object.assign({}, request));
+        return event.detail.promises[0]
+        .then(function(result) {
+          assert.equal(result.url, 'https://test.com?q=value1');
+        })
+      });
+
+      test('Should evaluate headers', function() {
+        var event = fire('before-request', Object.assign({}, request));
+        return event.detail.promises[0]
+        .then(function(result) {
+          assert.equal(result.headers, 'x-test: value2 value1\nx-test2: value3 value4');
+        })
+      });
+
+      test('Should evaluate method', function() {
+        var event = fire('before-request', Object.assign({}, request));
+        return event.detail.promises[0]
+        .then(function(result) {
+          assert.equal(result.method, 'value3 value4');
+        })
+      });
+
+      test('Should evaluate payload', function() {
+        var event = fire('before-request', Object.assign({}, request));
+        return event.detail.promises[0]
+        .then(function(result) {
+          assert.equal(result.payload, 'value4');
+        })
+      });
+    });
+    </script>
+
+  </body>
+</html>

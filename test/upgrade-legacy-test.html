@@ -1,0 +1,59 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../iron-test-helpers/test-helpers.js"></script>
+    <script src="../../iron-test-helpers/mock-interactions.js"></script>
+
+    <!-- Step 1: import the element to test -->
+    <link rel="import" href="../variables-evaluator.html">
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <variables-evaluator></variables-evaluator>
+      </template>
+    </test-fixture>
+
+    <script>
+    /* global suite, test, fixture, assert */
+    suite('_updgradeLegacy', function() {
+      var element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Upgrades ${now}', function() {
+        assert.equal(element._updgradeLegacy('test ${now}'), 'test now()');
+      });
+
+      test('Upgrades ${now} with groups', function() {
+        assert.equal(element._updgradeLegacy('test ${now:1}'), 'test now(1)');
+      });
+
+      test('Upgrades ${random}', function() {
+        assert.equal(element._updgradeLegacy('test ${random}'), 'test random()');
+      });
+
+      test('Upgrades ${random} with groups', function() {
+        assert.equal(element._updgradeLegacy('test ${random:1}'), 'test random(1)');
+      });
+    });
+    </script>
+
+  </body>
+</html>
