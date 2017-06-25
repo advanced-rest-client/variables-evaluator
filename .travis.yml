@@ -3,19 +3,24 @@ dist: trusty
 node_js: stable
 before_script:
 - npm install --silent bower polymer-cli
-- ./node_modules/.bin/bower install --silent
+- "./node_modules/.bin/bower install --silent"
 addons:
   sauce_connect: true
 script:
 - npm run lint
-- ./node_modules/.bin/polymer test --plugin sauce --job-name "variables-evaluator:${TRAVIS_BRANCH}" --build-number=${TRAVIS_BUILD_NUMBER}
+- ./node_modules/.bin/polymer test --plugin sauce --job-name "variables-evaluator:${TRAVIS_BRANCH}"
+  --build-number=${TRAVIS_BUILD_NUMBER}
 cache:
   directories:
   - bower_components
   - node_modules
 branches:
   only:
-    - stage
-    - develop
+  - stage
+  - develop
 after_success:
-  - node tasks/ci.js
+- node tasks/ci.js
+env:
+  global:
+  - secure: K0J/ZRBsw1ZzpJP/AqDMADfs+Rk3rzeI/4dXh8A5V47riokfMbMgsTzLkrGnm3HVa5n8n9vDBDk+KLBzNdjHEntkY8tJh3QPVVT8iXb3oBogry4Uyrr2x7m9HB74ZVamvEsusgfiUEcj3ZD4eJ1VhB0rdgxOqZwV9EtNX/IiQjwUyh/8BAxjPebYe4tZXeIdeNNKf5Y9YtffFGpQ3qLDUT1faT3EXQd5ul+1S2ukKAHGbY27kFbiyMueIIC0mB2KuNP6zmVG7RrAQZLmjNqmc4Ne+hf73jVstWO+IXMqZnS4b7W7MFDMGJo//7lcG3vAngRJOu8ZDyR+pgyoyAxfrQo7TNsvkaSLCQXd0Hmc9N2LBS71uSzMQqN4owb0GjipGWeluJWiqzCGcrtS1Ymn2CKnGx8SdxApGVs+Px7Xpdv16cD9cdeEmJRolNckVKu+ON5S70VvNzd3/TxRThoRztA2np9vBVryeBeotPskVlWdcqwg2vr19tBEKyNwuR7rlNNZom2xKie9C8x+q9n85T9s9TmEq+vTgn2xWD24vlW/p7nC2K/nu0at1VrsWF8fPOMSpb1Ux+oaaK6WdgCcI6EjFoSUEv6Tu3lvRNxY0V56ryNvWA63l1+7f01SV49dyYbtveCbRyCdBHMtFMEIH5qJYGuL2dCP0ac35eddUK4=
+  - secure: PmLZCPcfGF53478CN79mUV1l+jWJwz63CCWmVY8zS2WJbPBaxYIMTLT2DDoBEy0Coo+a/NA7ZRPe7E7RMiMynAioagLcdtoiMGBviFGA1TtqpG0TnTxEq5nyxpQuk8gq4P+KIBsmEDqiAETG8PmJhnNPt3c7EbJGHX3MddqtI5LwCG2FtQjDxu7A/jG3NwERI/cPjw+gq4ZYTuztvwLyKy0+VC5gXZB+mCwcjPiSrUA8ymtVHz2mMRvEYPfnbdtbALiScDuW5FHLma4MVOf+MT1itkog88btbpjCnDaGaSJLbiyZOSuBlc0TaBipxBqGlQ+BZ7fk3c2ACE2b6hdcer/CoTkasyUN6jyM0kM0MiMoSCamMIwXgbDYnywbdbZhCKmkTKAIrqXPCWUqMlfMD8rrX+lzqOut6FhKUV7zoUrEQ3jjXiXLcCyklCfrCd5gtpbUo2HFcARAFihR+9xSGpm9Vqcdcjm8Ax688KUV3xxLCsrGMpebMS8ECUysWhfGMdIfza4DHsAS2pUeoEDnrBEwGtIg9G3rPLzU9bHUAbSEBNOKnH1VHHFaGChxk9S0PUkApiFMIJCePoscu/1Fp67F1V4Ij/HO5Usx5oBUAkyb8ug34fUIgTF3tui316Epv4qyUCb/y0RF9Ik8hnV/l7guyF9LyU0bOTT0R9FyG0M=
