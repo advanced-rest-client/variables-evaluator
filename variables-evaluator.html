@@ -131,7 +131,7 @@ Polymer({
         return {
           property: property,
           value: value
-        }
+        };
       });
     }, this);
     return Promise.all(p)
@@ -181,6 +181,14 @@ Polymer({
    * @return {Promise<String>} Promise that resolves to evaluated value.
    */
   evaluateVariable: function(value, context) {
+    var typeOf = typeof value;
+    // Non primitives + null
+    if (typeOf === 'object') {
+      return Promise.resolve(value);
+    }
+    if (typeOf !== 'string') {
+      value = String(value);
+    }
     var promise;
     if (context) {
       promise = Promise.resolve(context);
@@ -199,14 +207,12 @@ Polymer({
         value = this._prepareValue(value);
       } catch (e) {
         return Promise.reject(e);
-        return;
       }
       if (!this._jexl) {
         try {
           this._jexl = require('Jexl');
         } catch (e) {
           return Promise.reject(e);
-          return;
         }
       }
       return this._jexl.eval(value, context);
@@ -242,7 +248,7 @@ Polymer({
   },
 
   _processContextVariables: function(result, variables, requireEvaluation, runCount) {
-    var requireEvaluation = requireEvaluation || variables.filter(function(item) {
+    requireEvaluation = requireEvaluation || variables.filter(function(item) {
       return !!~item.value.indexOf('${');
     });
     variables.forEach(function(item) {
@@ -400,7 +406,7 @@ Polymer({
     } else {
       fnName = fnName[0].toUpperCase() + fnName.substr(1);
       var localFnName = '__evalFn' + fnName;
-      if (typeof this[localFnName] === 'function' ) {
+      if (typeof this[localFnName] === 'function') {
         return this[localFnName](args);
       }
     }
@@ -408,7 +414,7 @@ Polymer({
       'message': ['Variables evaluator', 'Function not found', fnName],
       'level': 'error'
     });
-    console.error('Function not found', fnName, 'local name', localFnName);
+    console.error('Function not found', fnName);
     throw new Error('Unsuppored function ' + fnName);
   },
 
