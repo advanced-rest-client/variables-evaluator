@@ -79,28 +79,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return element.evaluateVariable('test')
         .then(function(result) {
           assert.equal(result, 'test');
-        })
+        });
       });
 
       test('Should return value for variable', function() {
         return element.evaluateVariable('test ${test1}')
         .then(function(result) {
           assert.equal(result, 'test value1');
-        })
+        });
       });
 
       test('Should return value for complex variable', function() {
         return element.evaluateVariable('test ${test3}')
         .then(function(result) {
           assert.equal(result, 'test value3 value4');
-        })
+        });
       });
 
       test('Should use context from arguments', function() {
         return element.evaluateVariable('test ${test3}', {test3: 'value3'})
         .then(function(result) {
           assert.equal(result, 'test value3');
-        })
+        });
       });
 
       test('Should evaluate legacy now function', function() {
@@ -108,7 +108,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .then(function(result) {
           var now = result.split(' ')[1];
           assert.isFalse(isNaN(now));
-        })
+        });
       });
 
       test('Should evaluate legacy now function with group', function() {
@@ -116,7 +116,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .then(function(result) {
           var values = result.split(' ');
           assert.equal(values[0], values[2]);
-        })
+        });
       });
 
       test('Should evaluate legacy random function', function() {
@@ -124,7 +124,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .then(function(result) {
           var now = result.split(' ')[1];
           assert.isFalse(isNaN(now));
-        })
+        });
       });
 
       test('Should evaluate legacy random function with group', function() {
@@ -132,7 +132,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .then(function(result) {
           var values = result.split(' ');
           assert.equal(values[0], values[2]);
-        })
+        });
       });
 
       test('Should evaluate now()', function() {
@@ -140,7 +140,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .then(function(result) {
           var now = result.split(' ')[1];
           assert.isFalse(isNaN(now));
-        })
+        });
       });
 
       test('Should evaluate now() with group', function() {
@@ -148,7 +148,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .then(function(result) {
           var values = result.split(' ');
           assert.equal(values[0], values[2]);
-        })
+        });
       });
 
       test('Should evaluate random()', function() {
@@ -156,7 +156,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .then(function(result) {
           var now = result.split(' ')[1];
           assert.isFalse(isNaN(now));
-        })
+        });
       });
 
       test('Should evaluate random() with group', function() {
@@ -164,21 +164,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .then(function(result) {
           var values = result.split(' ');
           assert.equal(values[0], values[2]);
-        })
+        });
       });
 
       test('Should evaluate Math function', function() {
         return element.evaluateVariable('test Math.abs(-100)')
         .then(function(result) {
           assert.equal(result, 'test 100');
-        })
+        });
       });
 
       test('Should evaluate String function', function() {
         return element.evaluateVariable('test String.toUpperCase(test)')
         .then(function(result) {
           assert.equal(result, 'test TEST');
-        })
+        });
       });
 
       test('Should evaluate encodeURIComponent()', function() {
@@ -197,13 +197,61 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       test('Should reject invalid input', function() {
         return element.evaluateVariable('test ${test')
-        .then(function(result) {
+        .then(function() {
           throw new Error('TEST');
         })
         .catch(function(cause) {
           if (cause.message === 'TEST') {
             throw new Error('Passed invalid value');
           }
+        });
+      });
+
+      test('Should not evalueate object', function() {
+        var obj = {'a': 'b'};
+        return element.evaluateVariable(obj)
+        .then(function(result) {
+          assert.isTrue(obj === result);
+        });
+      });
+
+      test('Should not evalueate FormData', function() {
+        var obj = new FormData();
+        return element.evaluateVariable(obj)
+        .then(function(result) {
+          assert.isTrue(obj === result);
+        });
+      });
+
+      test('Should not evalueate Blob', function() {
+        var obj = new Blob(['test']);
+        return element.evaluateVariable(obj)
+        .then(function(result) {
+          assert.isTrue(obj === result);
+        });
+      });
+
+      test('Should not evalueate null', function() {
+        var obj = null;
+        return element.evaluateVariable(obj)
+        .then(function(result) {
+          assert.isTrue(obj === result);
+        });
+      });
+
+      test('Should evaluate numbers', function() {
+        var obj = 2;
+        return element.evaluateVariable(obj)
+        .then(function(result) {
+          assert.isTrue('2' === result);
+        });
+      });
+
+      test('Should evaluate booleans', function() {
+        var obj = false;
+        return element.evaluateVariable(obj)
+        .then(function(result) {
+          assert.isTrue('false' === result);
         });
       });
     });
