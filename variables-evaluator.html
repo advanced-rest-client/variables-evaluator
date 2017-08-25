@@ -126,6 +126,9 @@ Polymer({
   _processBeforeRequest: function(request, resolve, reject) {
     var p = ['url', 'method', 'headers', 'payload']
     .map(function(property) {
+      if (!request[property]) {
+        return Promise.resolve();
+      }
       return this.evaluateVariable(request[property])
       .then(function(value) {
         return {
@@ -137,6 +140,9 @@ Polymer({
     return Promise.all(p)
     .then(function(results) {
       results.forEach(function(item) {
+        if (!item) {
+          return;
+        }
         request[item.property] = item.value;
       });
       return request;
