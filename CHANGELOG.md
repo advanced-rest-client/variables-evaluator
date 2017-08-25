@@ -1,3 +1,13 @@
+<a name="0.1.4"></a>
+## [0.1.4](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.3...0.1.4) (2017-08-25)
+
+
+### Fix
+
+* Fixes #1 - adds "undefined" stirng value to before-request ([29441a96c5382ff95602b7d8fc70d4feaa07b594](https://github.com/advanced-rest-client/variables-evaluator/commit/29441a96c5382ff95602b7d8fc70d4feaa07b594)), closes [#1](https://github.com/advanced-rest-client/variables-evaluator/issues/1)
+
+
+
 <a name="0.1.3"></a>
 ## [0.1.3](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.2...0.1.3) (2017-08-21)
 
