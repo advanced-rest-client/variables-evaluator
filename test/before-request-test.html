@@ -101,7 +101,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return event.detail.promises[0]
         .then(function(result) {
           assert.equal(result.url, 'https://test.com?q=value1');
-        })
+        });
       });
 
       test('Should evaluate headers', function() {
@@ -109,7 +109,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return event.detail.promises[0]
         .then(function(result) {
           assert.equal(result.headers, 'x-test: value2 value1\nx-test2: value3 value4');
-        })
+        });
       });
 
       test('Should evaluate method', function() {
@@ -117,7 +117,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return event.detail.promises[0]
         .then(function(result) {
           assert.equal(result.method, 'value3 value4');
-        })
+        });
       });
 
       test('Should evaluate payload', function() {
@@ -125,7 +125,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return event.detail.promises[0]
         .then(function(result) {
           assert.equal(result.payload, 'value4');
-        })
+        });
+      });
+
+      test('Should not set payload', function() {
+        var request = {
+          url: 'https://test.com?q=${test1}',
+          headers: 'x-test: ${test2}\nx-test2: ${test3}',
+          method: 'GET',
+          promises: []
+        };
+        var event = fire('before-request', Object.assign({}, request));
+        return event.detail.promises[0]
+        .then(function(result) {
+          assert.isUndefined(result.payload);
+        });
+      });
+
+      test('Should not set headers', function() {
+        var request = {
+          url: 'https://test.com?q=${test1}',
+          method: 'GET',
+          promises: []
+        };
+        var event = fire('before-request', Object.assign({}, request));
+        return event.detail.promises[0]
+        .then(function(result) {
+          assert.isUndefined(result.headers);
+        });
       });
     });
     </script>
