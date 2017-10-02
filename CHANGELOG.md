@@ -1,3 +1,13 @@
+<a name="0.1.6"></a>
+## [0.1.6](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.4...0.1.6) (2017-10-02)
+
+
+### Fix
+
+* Changed the flow of processing before request properties to avoid race condition. ([ae15dbb082abbd11b16746238fcee5a192ecea49](https://github.com/advanced-rest-client/variables-evaluator/commit/ae15dbb082abbd11b16746238fcee5a192ecea49))
+
+
+
 <a name="0.1.5"></a>
 ## [0.1.5](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.4...0.1.5) (2017-08-25)
 
