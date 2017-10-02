@@ -124,30 +124,27 @@ Polymer({
   },
 
   _processBeforeRequest: function(request, resolve, reject) {
-    var p = ['url', 'method', 'headers', 'payload']
-    .map(function(property) {
-      if (!request[property]) {
-        return Promise.resolve();
-      }
-      return this.evaluateVariable(request[property])
-      .then(function(value) {
-        return {
-          property: property,
-          value: value
-        };
-      });
-    }, this);
-    return Promise.all(p)
-    .then(function(results) {
-      results.forEach(function(item) {
-        if (!item) {
-          return;
+    var promise;
+    if (this.context) {
+      promise = Promise.resolve(this.context);
+    } else {
+      promise = this._buildContext();
+    }
+    return promise
+    .then(function(context) {
+      var p = ['url', 'method', 'headers', 'payload']
+      .map(function(property) {
+        if (!request[property]) {
+          return Promise.resolve();
         }
-        request[item.property] = item.value;
-      });
-      return request;
-    })
-    .then(function(request) {
+        return this.evaluateVariable(request[property], context)
+        .then(function(value) {
+          request[property] = value;
+        });
+      }, this);
+      return Promise.all(p);
+    }.bind(this))
+    .then(function() {
       resolve(request);
     })
     .catch(function(cause) {
