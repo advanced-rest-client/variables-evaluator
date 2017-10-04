@@ -106,7 +106,9 @@ Polymer({
     // A cache object for groupping
     cache: Object,
     // Cached context for current operation.
-    context: Object
+    context: Object,
+    // If set it will not handle `before-request` event
+    noBeforeRequest: Boolean
   },
 
   _attachListeners: function(node) {
@@ -120,6 +122,9 @@ Polymer({
   },
 
   _beforeRequestHandler: function(e) {
+    if (this.noBeforeRequest) {
+      return;
+    }
     var promise = new Promise(function(request, resolve, reject) {
       this.cache = undefined;
       this.context = undefined;
