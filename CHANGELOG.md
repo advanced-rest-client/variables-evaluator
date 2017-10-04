@@ -1,3 +1,13 @@
+<a name="0.1.9"></a>
+## [0.1.9](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.8...0.1.9) (2017-10-04)
+
+
+### New
+
+* Added an option to prohibit handing Before-Request event. ([8650141c0261c5fc7aeff8440549e7f0f418ce23](https://github.com/advanced-rest-client/variables-evaluator/commit/8650141c0261c5fc7aeff8440549e7f0f418ce23))
+
+
+
 <a name="0.1.8"></a>
 ## [0.1.8](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.7...0.1.8) (2017-10-04)
 
