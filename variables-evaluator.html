@@ -14,6 +14,8 @@ the License.
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../arc-polyfills/arc-polyfills.html">
 <link rel="import" href="../jexl/jexl.html">
+<link rel="import" href="../events-target-behavior/events-target-behavior.html">
+
 <!--
 `<variables-evaluator>` Variables evaluator for the Advanced REST Client
 
@@ -91,6 +93,9 @@ VariablesTokenizer.prototype.eof = function() {
 };
 Polymer({
   is: 'variables-evaluator',
+
+  behaviors: [ArcBehaviors.EventsTargetBehavior],
+
   properties: {
     functionRegex: {
       type: RegExp,
@@ -104,14 +109,14 @@ Polymer({
     context: Object
   },
 
-  attached: function() {
-    this.listen(window, 'before-request', '_beforeRequestHandler');
-    this.listen(window, 'evaluate-variable', '_evaluateVariableHandler');
+  _attachListeners: function(node) {
+    this.listen(node, 'before-request', '_beforeRequestHandler');
+    this.listen(node, 'evaluate-variable', '_evaluateVariableHandler');
   },
 
-  detached: function() {
-    this.unlisten(window, 'before-request', '_beforeRequestHandler');
-    this.unlisten(window, 'evaluate-variable', '_evaluateVariableHandler');
+  _detachListeners: function(node) {
+    this.unlisten(node, 'before-request', '_beforeRequestHandler');
+    this.unlisten(node, 'evaluate-variable', '_evaluateVariableHandler');
   },
 
   _beforeRequestHandler: function(e) {

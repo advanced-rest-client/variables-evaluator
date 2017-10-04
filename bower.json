@@ -21,7 +21,8 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^1.9.2",
     "jexl": "advanced-rest-client/Jexl#^1.2.1",
-    "arc-polyfills": "advanced-rest-client/arc-polyfills#^0.1.8"
+    "arc-polyfills": "advanced-rest-client/arc-polyfills#^0.1.8",
+    "events-target-behavior": "advanced-rest-client/events-target-behavior#^0.1.3"
   },
   "devDependencies": {
     "iron-component-page": "polymerelements/iron-component-page#1.0.0",
