@@ -1,3 +1,13 @@
+<a name="0.1.7"></a>
+## [0.1.7](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.6...0.1.7) (2017-10-04)
+
+
+### Update
+
+* Addeed events-target-behavior ([ff7f619f5de4b4476c6e7e399b4be456262097df](https://github.com/advanced-rest-client/variables-evaluator/commit/ff7f619f5de4b4476c6e7e399b4be456262097df))
+
+
+
 <a name="0.1.6"></a>
 ## [0.1.6](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.4...0.1.6) (2017-10-02)
 
