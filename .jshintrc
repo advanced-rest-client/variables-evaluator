@@ -16,6 +16,7 @@
   "newcap": false,
   "mocha": true,
   "globals": {
-    "Polymer": true
+    "Polymer": true,
+    "ArcBehaviors": true
   }
 }
