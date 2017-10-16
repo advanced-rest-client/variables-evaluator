@@ -31,7 +31,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <script>
     /* global suite, test, fixture, assert */
-    suite('_buildContext()', function() {
+    suite('buildContext()', function() {
       var element;
 
       var contextFactory = function(e) {
@@ -72,25 +72,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       test('Should create a context', function() {
-        return element._buildContext();
+        return element.buildContext();
       });
 
       test('Sets variable value', function() {
-        return element._buildContext()
+        return element.buildContext()
         .then(function(context) {
           assert.equal(context.test2, 'value2 value1');
         });
       });
 
       test('Sets variable value defined later', function() {
-        return element._buildContext()
+        return element.buildContext()
         .then(function(context) {
           assert.equal(context.test3, 'value3 value4');
         });
       });
 
       test('Do not uses disabled elements', function() {
-        return element._buildContext()
+        return element.buildContext()
         .then(function(context) {
           assert.isUndefined(context.test5);
         });
