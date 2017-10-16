@@ -1,3 +1,13 @@
+<a name="0.1.11"></a>
+## [0.1.11](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.10...0.1.11) (2017-10-16)
+
+
+### Update
+
+* Moved context creation to external behavior. ([1e251e47d70ecebf56f157c70d23e1592b35c55f](https://github.com/advanced-rest-client/variables-evaluator/commit/1e251e47d70ecebf56f157c70d23e1592b35c55f))
+
+
+
 <a name="0.1.10"></a>
 ## [0.1.10](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.9...0.1.10) (2017-10-04)
 
