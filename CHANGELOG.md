@@ -1,3 +1,17 @@
+<a name="0.1.13"></a>
+## [0.1.13](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.12...0.1.13) (2017-11-10)
+
+
+### Fix
+
+* Fixes https://github.com/advanced-rest-client/arc-electron/issues/5 ([d9ca2709af5f683f097bb5658e6fa6690c1bc4c0](https://github.com/advanced-rest-client/variables-evaluator/commit/d9ca2709af5f683f097bb5658e6fa6690c1bc4c0))
+
+### New
+
+* adding demo page ([2fe5f9b56279cef492b07cef95f16bf1d2548d7f](https://github.com/advanced-rest-client/variables-evaluator/commit/2fe5f9b56279cef492b07cef95f16bf1d2548d7f))
+
+
+
 <a name="0.1.12"></a>
 ## [0.1.12](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.11...0.1.12) (2017-10-16)
 
