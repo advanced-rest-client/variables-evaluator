@@ -17,8 +17,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <script src="../../web-component-tester/browser.js"></script>
     <script src="../../iron-test-helpers/test-helpers.js"></script>
     <script src="../../iron-test-helpers/mock-interactions.js"></script>
-
-    <!-- Step 1: import the element to test -->
     <link rel="import" href="../variables-evaluator.html">
   </head>
   <body>
@@ -42,17 +40,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       test('Prepares string with variable', function() {
-        assert.equal(element._prepareValue('test ${val}'), '"test " + val + ""');
+        assert.equal(element._prepareValue('test ${val}'), '\'test \' + val + \'\'');
       });
 
       test('Throws error for bad syntax', function() {
-        assert.throws(function () {
+        assert.throws(function() {
           element._prepareValue('test ${val');
         }, Error);
       });
 
       test('Prepares string with complex structure', function() {
-        assert.equal(element._prepareValue('test ${val} test ${val} test ${val}'), '"test " + val + " test " + val + " test " + val + ""');
+        var result = element._prepareValue('test ${val} test ${val} test ${val}');
+        var compare = '\'test \' + val + \' test \' + val + \' test \' + val + \'\'';
+        assert.equal(result, compare);
       });
     });
     </script>
