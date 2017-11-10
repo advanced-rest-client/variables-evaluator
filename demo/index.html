@@ -1,0 +1,107 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+  <title>variables-manager demo</title>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../paper-button/paper-button.html">
+  <link rel="import" href="../variables-evaluator.html">
+
+  <style>
+  .vertical-section-container {
+    max-width: 600px;
+    margin: 40px auto;
+  }
+
+  output {
+    display: block;
+    white-space: pre-wrap;
+  }
+  </style>
+</head>
+<body unresolved>
+  <template is="dom-bind" id="app">
+    <div class="vertical-section-container">
+      <h3>The `variables-evaluator`</h3>
+      <variables-evaluator id="evaluator"></variables-evaluator>
+
+      <fieldset>
+        <div>
+          <legend>Input data</legend>
+          <label for="vars" id="varsLabel">Variables</label>
+          <p class="desc" id="varsDesc">Add variables in each line using ":" as a delimiter between name and the value</p>
+          <textarea name="variables" id="vars" rows="8" cols="80" aria-labelledby="varsLabel" aria-describedby="varsDesc" value="{{vars::input}}"></textarea>
+        </div>
+        <div>
+          <label for="vars" id="varsLabel">Value</label>
+          <p class="desc" id="varsDesc">Enter a text to be evaluated for variables</p>
+          <textarea name="textvalue" id="val" rows="8" cols="80" aria-labelledby="valLabel" aria-describedby="valDesc" value="{{val::input}}"></textarea>
+        </div>
+        <paper-button raised on-tap="_eval">Evaluate</paper-button>
+      </fieldset>
+
+      <h3>Eval result</h3>
+      <output>[[evalResult]]</output>
+    </div>
+  </template>
+  <script>
+  (function(scope) {
+    scope.evalResult = '';
+    scope.val = '{\n\t"hello-world": "${variable}"\n}';
+    scope.vars = 'variable: my test value\notherVariable: other value';
+
+    scope._eval = function() {
+      var element = document.getElementById('evaluator');
+      element.cache = undefined;
+      element.context = undefined;
+      element.evaluateVariable(scope.val)
+      .then(function(result) {
+        scope.evalResult = result;
+      })
+      .catch(function(cause) {
+        scope.evalResult = cause.message;
+        console.error(cause);
+      });
+    };
+
+    scope.getVariables = function() {
+      var result = [];
+      if (!scope.vars) {
+        return result;
+      }
+      scope.vars.split('\n').forEach(line => {
+        let parts = line.split(':');
+        let _data = {
+          variable: parts[0].trim(),
+          enabled: true,
+          value: ''
+        };
+        if (parts[1]) {
+          _data.value = parts[1].trim();
+        }
+        result.push(_data);
+      });
+      return result;
+    };
+
+    window.addEventListener('variable-list', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.detail.value = scope.getVariables();
+      e.detail.environment = 'default';
+    });
+  })(document.getElementById('app'));
+  </script>
+</body>
+</html>

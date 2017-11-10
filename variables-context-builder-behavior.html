@@ -166,7 +166,12 @@ the License.
           if (!value || !~value.indexOf('${')) {
             return Promise.resolve(value);
           }
-          value = this._prepareValue(value);
+          let parts = value.split('\n');
+          if (parts.length > 1) {
+            value = this._prepareMultilineValue(parts);
+          } else {
+            value = this._prepareValue(value);
+          }
         } catch (e) {
           return Promise.reject(e);
         }
@@ -176,6 +181,16 @@ the License.
           } catch (e) {
             return Promise.reject(e);
           }
+        }
+        var result;
+        if (value instanceof Array) {
+          let ps = value.map(item => {
+            return this._jexl.eval(item, context);
+          });
+          return Promise.all(ps)
+          .then(result => result.join('\n'));
+        } else {
+          result = this._jexl.eval(value, context);
         }
         return this._jexl.eval(value, context);
       }.bind(this));
@@ -275,6 +290,17 @@ the License.
       throw new Error('Unsuppored function ' + fnName);
     },
 
+    _prepareMultilineValue: function(lines) {
+      return lines.map(line => {
+        let _res = this._prepareValue(line);
+        if (_res === line) {
+          _res = _res.replace(/'/g, '\\\'');
+          _res = '\'' + _res + '\'';
+        }
+        return _res;
+      });
+    },
+
     /**
      * Replaces strings witht quoted string and variables notation into
      * variables that Jexl will understand.
@@ -286,6 +312,7 @@ the License.
       if (!value || !~value.indexOf('${')) {
         return value;
       }
+      value = value.replace(/'/g, '\\\'');
       var tokenizer = new VariablesTokenizer(value);
       var parsed = '';
       while (true) {
@@ -297,7 +324,7 @@ the License.
             return value;
           }
           tokenizer.index = _startIndex;
-          parsed += '"' + tokenizer.eof() + '"';
+          parsed += '\'' + tokenizer.eof() + '\'';
           return parsed;
         }
         var variable = tokenizer.nextUntil('}');
@@ -307,7 +334,7 @@ the License.
         variable = variable.substr(1);
         var replacement = ' + ' + variable + ' + ';
         var newValue = '';
-        newValue += '"' + left + '"';
+        newValue += '\'' + left + '\'';
         newValue += replacement;
         parsed += newValue;
       }

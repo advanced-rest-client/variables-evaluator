@@ -89,6 +89,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
       });
 
+      test('Evaluates JSON string', function() {
+        var str = '{\n"v1":"${test1}",\n\t"v2": "${test2}"\n}';
+        return element.evaluateVariable(str)
+        .then(function(result) {
+          assert.equal(result, '{\n"v1":"value1",\n\t"v2": "value2 value1"\n}');
+        });
+      });
+
       test('Should return value for complex variable', function() {
         return element.evaluateVariable('test ${test3}')
         .then(function(result) {
