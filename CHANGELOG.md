@@ -1,3 +1,13 @@
+<a name="0.1.15"></a>
+## [0.1.15](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.14...0.1.15) (2018-02-09)
+
+
+### Fix
+
+* Making sure operations are executed on strings. ([40e08ba9a5d4408629f031a9e2c6c20248e3bff0](https://github.com/advanced-rest-client/variables-evaluator/commit/40e08ba9a5d4408629f031a9e2c6c20248e3bff0))
+
+
+
 <a name="0.1.14"></a>
 ## [0.1.14](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.13...0.1.14) (2017-11-10)
 
