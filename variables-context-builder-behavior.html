@@ -99,7 +99,7 @@ the License.
 
     _processContextVariables: function(result, variables, requireEvaluation, runCount) {
       requireEvaluation = requireEvaluation || variables.filter(function(item) {
-        return !!~item.value.indexOf('${');
+        return !!~String(item.value).indexOf('${');
       });
       variables.forEach(function(item) {
         result[item.variable] = item.value;
@@ -122,7 +122,7 @@ the License.
           result[item.variable] = item.value;
         });
         requireEvaluation = items.filter(function(item) {
-          return !!~item.value.indexOf('${');
+          return !!~String(item.value).indexOf('${');
         });
         runCount = runCount || 1;
         if (requireEvaluation.length === 0 || runCount >= 2) {
@@ -163,7 +163,7 @@ the License.
         try {
           value = this._updgradeLegacy(value);
           value = this._evalFunctions(value);
-          if (!value || !~value.indexOf('${')) {
+          if (!value || !~String(value).indexOf('${')) {
             return Promise.resolve(value);
           }
           let parts = value.split('\n');
@@ -309,7 +309,7 @@ the License.
      * @return {String} Proper syntax for Jexl
      */
     _prepareValue: function(value) {
-      if (!value || !~value.indexOf('${')) {
+      if (!value || !~String(value).indexOf('${')) {
         return value;
       }
       value = value.replace(/'/g, '\\\'');
@@ -373,7 +373,7 @@ the License.
     },
 
     _applyArgumentsContext: function(arg, context) {
-      if (arg.indexOf('${') === 0) {
+      if (String(arg).indexOf('${') === 0) {
         arg = arg.substr(2, arg.length - 3);
         if (context[arg]) {
           return context[arg];
