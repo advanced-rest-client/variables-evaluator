@@ -212,6 +212,31 @@ the License.
       }.bind(this));
     },
     /**
+     * Recursively evaluate variables on an object.
+     *
+     * @param {Object} obj The map containg variables
+     * @param {?Array<String>} props Optional, list of properties to evaluate.
+     * If not set then it scans for all keys in the object.
+     * @return {Promise} Promise resolved to evalusated object.
+     */
+    evaluateVariables: function(obj, props) {
+      props = props || Object.keys(obj);
+      var prop = props.shift();
+      if (!prop) {
+        return Promise.resolve(obj);
+      }
+      if (!obj[prop]) {
+        return this.evaluateVariables(obj, props);
+      }
+      return this.evaluateVariable(obj[prop])
+      .then(function(value) {
+        obj[prop] = value;
+      })
+      .then(function() {
+        return this.evaluateVariables(obj, props);
+      }.bind(this));
+    },
+    /**
      * Upgrades old syntax of magic variables to new one.
      * It replaces `${now}` and `${random}` to function calls: `now()` and
      * `random()`. It also keeps grouping.
