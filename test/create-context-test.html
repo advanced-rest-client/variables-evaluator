@@ -15,10 +15,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
-    <script src="../../iron-test-helpers/test-helpers.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
-
-    <!-- Step 1: import the element to test -->
     <link rel="import" href="../variables-evaluator.html">
   </head>
   <body>
@@ -93,6 +89,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return element.buildContext()
         .then(function(context) {
           assert.isUndefined(context.test5);
+        });
+      });
+
+      test('Override context values', function() {
+        const opts = {
+          test1: 'ov1',
+          test2: 'ov2'
+        };
+        return element.buildContext(opts)
+        .then(function(context) {
+          assert.equal(context.test1, 'ov1');
+          assert.equal(context.test2, 'ov2');
+          assert.equal(context.test3, 'value3 value4');
+        });
+      });
+
+      test('Adds new context values', function() {
+        const opts = {
+          test1: 'ov1',
+          test2: 'ov2',
+          newVar: 'new'
+        };
+        return element.buildContext(opts)
+        .then(function(context) {
+          assert.equal(context.test1, 'ov1');
+          assert.equal(context.test2, 'ov2');
+          assert.equal(context.newVar, 'new');
         });
       });
     });

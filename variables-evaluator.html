@@ -93,20 +93,34 @@ Polymer({
     if (this.noBeforeRequest) {
       return;
     }
-    var promise = new Promise(function(request, resolve, reject) {
+    e.detail.promises.push(this.processBeforeRequest(e.detail));
+  },
+  /**
+   * A function to call directly on the element to process request object on
+   * before request event.
+   *
+   * @param {Object} request ARC request object to process.
+   * @param {Object} override Optional. If not set then it clears the context
+   * and builds new one. Map of key-value pars to override variables
+   * or to add temporary variables to the context. Values for keys that
+   * exists in variables array (the `variable` property) will update value of
+   * the variable. Rest is added to the list.
+   * @return {Promise} Promise resolved to a request object.
+   */
+  processBeforeRequest: function(request, override) {
+    return new Promise(function(resolve, reject) {
       this.cache = undefined;
       this.context = undefined;
-      this._processBeforeRequest(request, resolve, reject);
-    }.bind(this, e.detail));
-    e.detail.promises.push(promise);
+      this._processBeforeRequest(request, override, resolve, reject);
+    }.bind(this));
   },
 
-  _processBeforeRequest: function(request, resolve, reject) {
+  _processBeforeRequest: function(request, override, resolve, reject) {
     var promise;
     if (this.context) {
       promise = Promise.resolve(this.context);
     } else {
-      promise = this.buildContext();
+      promise = this.buildContext(override);
     }
     return promise
     .then(function(context) {
