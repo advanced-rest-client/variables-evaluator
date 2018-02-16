@@ -15,10 +15,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
-    <script src="../../iron-test-helpers/test-helpers.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
-
-    <!-- Step 1: import the element to test -->
     <link rel="import" href="../variables-evaluator.html">
   </head>
   <body>
@@ -30,10 +26,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </test-fixture>
 
     <script>
-    /* global suite, test, fixture, assert */
+    /* global fixture, assert */
     suite('evaluateVariable()', function() {
       var element;
-
       var contextFactory = function(e) {
         e.preventDefault();
         e.detail.value = [{
@@ -260,6 +255,86 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return element.evaluateVariable(obj)
         .then(function(result) {
           assert.isTrue('false' === result);
+        });
+      });
+    });
+
+    suite('evaluateVariables()', function() {
+      let element;
+      const contextFactory = function(e) {
+        e.preventDefault();
+        e.detail.value = [{
+          variable: 'test1',
+          value: 'value1',
+          enabled: true
+        }, {
+          variable: 'test2',
+          value: 'value2 ${test1}',
+          enabled: true
+        }, {
+          variable: 'test3',
+          value: 'value3 ${test4}',
+          enabled: true
+        }, {
+          variable: 'test4',
+          value: 'value4',
+          enabled: true
+        }, {
+          variable: 'test5',
+          value: 'value5',
+          enabled: false
+        }];
+      };
+      const obj = {
+        var1: '${test1}',
+        var2: '${test2}',
+        var3: 'test-${test4}',
+        var4: 'hello'
+      };
+      suiteSetup(function() {
+        window.addEventListener('variable-list', contextFactory);
+      });
+
+      suiteTeardown(function() {
+        window.removeEventListener('variable-list', contextFactory);
+      });
+
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Returns promise', function() {
+        const tmp = Object.assign({}, obj);
+        assert.typeOf(element.evaluateVariables(tmp), 'promise');
+      });
+
+      test('Should return the same string without variables', function() {
+        const tmp = Object.assign({}, obj);
+        return element.evaluateVariables(tmp, ['var4'])
+        .then(function(result) {
+          assert.equal(result.var4, 'hello');
+        });
+      });
+
+      test('Should evaluate only listed properties', function() {
+        const tmp = Object.assign({}, obj);
+        return element.evaluateVariables(tmp, ['var1'])
+        .then(function(result) {
+          assert.equal(result.var1, 'value1');
+          assert.equal(result.var2, '${test2}');
+          assert.equal(result.var3, 'test-${test4}');
+          assert.equal(result.var4, 'hello');
+        });
+      });
+
+      test('Evaluate all properties', function() {
+        const tmp = Object.assign({}, obj);
+        return element.evaluateVariables(tmp)
+        .then(function(result) {
+          assert.equal(result.var1, 'value1');
+          assert.equal(result.var2, 'value2 value1');
+          assert.equal(result.var3, 'test-value4');
+          assert.equal(result.var4, 'hello');
         });
       });
     });
