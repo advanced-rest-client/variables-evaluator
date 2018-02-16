@@ -73,9 +73,15 @@ the License.
      *
      * If the `variables-manager` is not present it returns empty object.
      *
+     * @param {Object} override Map of key - value pars to override variables
+     * or to add temporary variables to the context. Values for keys that
+     * exists in variables array (the `variable` property) will update value of
+     * the variable. Rest is added to the list.
      * @return {Promise} Promise resolved to a context to be passed to Jaxl.
      */
-    buildContext: function() {
+    buildContext: function(override) {
+      override = override || {};
+      override = Object.assign({}, override);
       var event = this.fire('variable-list', {}, {
         cancelable: true
       });
@@ -92,7 +98,17 @@ the License.
         return item.enabled;
       });
       variables = variables.map(function(item) {
+        if (item.variable in override) {
+          item.value = override[item.variable];
+          delete override[item.variable];
+        }
         return Object.assign({}, item);
+      });
+      Object.keys(override).forEach(function(key) {
+        variables.push({
+          variable: key,
+          value: override[key]
+        });
       });
       return this._processContextVariables(result, variables);
     },
