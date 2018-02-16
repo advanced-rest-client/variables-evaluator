@@ -1,3 +1,13 @@
+<a name="0.2.1"></a>
+## [0.2.1](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.16...0.2.1) (2018-02-16)
+
+
+### Breaking
+
+* Adding ability to override contex values when processing request. This changes API of the element. ([79fe3100c09a9b435bf9fd91f33f31350b9b970f](https://github.com/advanced-rest-client/variables-evaluator/commit/79fe3100c09a9b435bf9fd91f33f31350b9b970f))
+
+
+
 <a name="0.1.16"></a>
 ## [0.1.16](https://github.com/advanced-rest-client/variables-evaluator/compare/0.1.15...0.1.16) (2018-02-09)
 
