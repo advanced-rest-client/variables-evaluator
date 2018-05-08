@@ -61,7 +61,7 @@ the License.
       functionRegex: {
         type: RegExp,
         value: function() {
-          return /([\.a-zA-Z0-9_-]+)\(([^)]*)?\)/gm;
+          return /(?:\${)?([\.a-zA-Z0-9_-]+)\(([^)]*)?\)(?:})?/gm;
         }
       },
       // Cached context for current operation.
@@ -259,11 +259,11 @@ the License.
         var variable = matches[0];
         var word = matches[1];
         var group = matches[2];
-        var replacement = word + '(';
+        var replacement = '${' + word + '(';
         if (group) {
           replacement += group;
         }
-        replacement += ')';
+        replacement += ')' + '}';
         value = value.replace(variable, replacement);
         reg.lastIndex -= 2; // replacement word is shorter by 2 characters
       }
