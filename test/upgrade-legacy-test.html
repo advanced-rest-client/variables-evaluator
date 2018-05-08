@@ -38,19 +38,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       test('Upgrades ${now}', function() {
-        assert.equal(element._updgradeLegacy('test ${now}'), 'test now()');
+        assert.equal(element._updgradeLegacy('test ${now}'), 'test ${now()}');
       });
 
       test('Upgrades ${now} with groups', function() {
-        assert.equal(element._updgradeLegacy('test ${now:1}'), 'test now(1)');
+        assert.equal(element._updgradeLegacy('test ${now:1}'), 'test ${now(1)}');
       });
 
       test('Upgrades ${random}', function() {
-        assert.equal(element._updgradeLegacy('test ${random}'), 'test random()');
+        assert.equal(element._updgradeLegacy('test ${random}'), 'test ${random()}');
       });
 
       test('Upgrades ${random} with groups', function() {
-        assert.equal(element._updgradeLegacy('test ${random:1}'), 'test random(1)');
+        assert.equal(element._updgradeLegacy('test ${random:1}'), 'test ${random(1)}');
       });
     });
     </script>
