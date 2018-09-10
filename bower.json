@@ -19,7 +19,8 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0",
     "jexl": "advanced-rest-client/Jexl#^2.0.0",
-    "events-target-behavior": "advanced-rest-client/events-target-behavior#^2.0.0"
+    "events-target-behavior": "advanced-rest-client/events-target-behavior#^2.0.0",
+    "variables-consumer-mixin": "advanced-rest-client/variables-consumer-mixin#2.0.0-preview"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^3.0.1",

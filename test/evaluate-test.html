@@ -20,7 +20,7 @@
       let element;
       const contextFactory = function(e) {
         e.preventDefault();
-        e.detail.value = [{
+        e.detail.variables = [{
           variable: 'test1',
           value: 'value1',
           enabled: true
@@ -44,11 +44,11 @@
       };
 
       suiteSetup(function() {
-        window.addEventListener('variable-list', contextFactory);
+        window.addEventListener('environment-current', contextFactory);
       });
 
       suiteTeardown(function() {
-        window.removeEventListener('variable-list', contextFactory);
+        window.removeEventListener('environment-current', contextFactory);
       });
 
       setup(function() {
@@ -255,7 +255,7 @@
       let element;
       const contextFactory = function(e) {
         e.preventDefault();
-        e.detail.value = [{
+        e.detail.variables = [{
           variable: 'test1',
           value: 'value1',
           enabled: true
@@ -284,11 +284,11 @@
         var4: 'hello'
       };
       suiteSetup(function() {
-        window.addEventListener('variable-list', contextFactory);
+        window.addEventListener('environment-current', contextFactory);
       });
 
       suiteTeardown(function() {
-        window.removeEventListener('variable-list', contextFactory);
+        window.removeEventListener('environment-current', contextFactory);
       });
 
       setup(function() {

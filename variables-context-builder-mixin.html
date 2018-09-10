@@ -103,9 +103,9 @@ ArcBehaviors.VariablesContextBuilderMixin = Polymer.dedupingMixin((base) => {
         override = {};
       }
       override = Object.assign({}, override);
-      const e = new CustomEvent('variable-list', {
-        composed: true,
+      const e = new CustomEvent('environment-current', {
         cancelable: true,
+        composed: true,
         bubbles: true,
         detail: {}
       });
@@ -114,7 +114,7 @@ ArcBehaviors.VariablesContextBuilderMixin = Polymer.dedupingMixin((base) => {
       if (!e.defaultPrevented) {
         return Promise.resolve(result);
       }
-      let variables = e.detail.value;
+      let variables = e.detail.variables;
       if (!variables || !variables.length) {
         return Promise.resolve(result);
       }
