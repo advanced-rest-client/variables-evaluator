@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0",
-    "jexl": "advanced-rest-client/Jexl#^2.0.0",
     "events-target-behavior": "advanced-rest-client/events-target-behavior#^2.0.0"
   },
   "devDependencies": {
@@ -27,7 +26,8 @@
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
     "iron-test-helpers": "PolymerElements/iron-test-helpers#^2.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
-    "paper-button": "PolymerElements/paper-button#^2.1.1"
+    "paper-button": "PolymerElements/paper-button#^2.1.1",
+    "jexl": "advanced-rest-client/Jexl#^2.0.0"
   },
   "ignore": [
     "**/.*",

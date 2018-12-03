@@ -60,6 +60,13 @@ the License.
  * });
  * ```
  *
+ * ## Changes in 2.0
+ *
+ * Jexl is now optional dependency. Install it from other sources and include into
+ * the web app. The web component version is offered by `advanced-rest-client/Jexl#^2.0.0`.
+ * Node version can be installed from `npm install jexl --save`.
+ * This prevents double inclusion in Electron environment.
+ *
  * @memberof LogicElements
  * @customElement
  * @polymer
@@ -67,8 +74,11 @@ the License.
  * @appliesMixin ArcBehaviors.VariablesContextBuilderMixin
  * @appliesMixin ArcBehaviors.EventsTargetBehavior
  */
-class VariablesEvaluator extends ArcBehaviors.EventsTargetBehavior(ArcBehaviors.VariablesContextBuilderMixin(Polymer.Element)) {
-  static get is() { return 'variables-evaluator'; }
+class VariablesEvaluator extends ArcBehaviors.EventsTargetBehavior(
+  ArcBehaviors.VariablesContextBuilderMixin(Polymer.Element)) {
+  static get is() {
+    return 'variables-evaluator';
+  }
   static get properties() {
     return {
       // A cache object for groupping

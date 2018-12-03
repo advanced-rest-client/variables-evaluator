@@ -13,7 +13,6 @@ License for the specific language governing permissions and limitations under
 the License.
 -->
 <link rel="import" href="../polymer/lib/utils/mixin.html">
-<link rel="import" href="../jexl/jexl.html">
 <script>
 (function(global) {
 'use strict';
@@ -213,19 +212,22 @@ ArcBehaviors.VariablesContextBuilderMixin = Polymer.dedupingMixin((base) => {
         return Promise.reject(e);
       }
       if (!this._jexl) {
-        try {
-          this._jexl = require('Jexl');
-        } catch (e) {
-          return Promise.reject(e);
+        if (typeof window.Jexl !== 'undefined') {
+          this._jexl = window.Jexl;
+        } else {
+          try {
+            this._jexl = require('Jexl');
+          } catch (e) {
+            return Promise.reject(e);
+          }
         }
       }
-      let result;
       if (value instanceof Array) {
         const ps = value.map((item) => this._jexl.eval(item, context));
         return Promise.all(ps)
         .then((result) => result.join('\n'));
       } else {
-        result = this._jexl.eval(value, context);
+        return this._jexl.eval(value, context);
       }
       return this._jexl.eval(value, context);
     }
