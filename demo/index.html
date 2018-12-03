@@ -11,6 +11,7 @@
   <link rel="import" href="../../polymer/lib/elements/dom-bind.html">
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   <link rel="import" href="../../paper-button/paper-button.html">
+  <link rel="import" href="../../jexl/jexl.html">
   <link rel="import" href="../variables-evaluator.html">
   <custom-style>
     <style is="custom-style" include="demo-pages-shared-styles">
@@ -51,7 +52,7 @@
   <script>
   (function(scope) {
     scope.evalResult = '';
-    scope.val = '{\n\t"hello-world": "${variable}"\n\t"function": "now()"\n}';
+    scope.val = '{\n\t"hello-world": "${variable}"\n\t"regex1": "^([\\\\w][\\\\w\\\\s\\\\-]*[\\\\w]|[\\\\w])$",\n\t"function": "now()"\n}';
     scope.vars = 'variable: my test value\notherVariable: other value';
 
     scope._eval = function() {
@@ -73,7 +74,7 @@
       if (!scope.vars) {
         return result;
       }
-      scope.vars.split('\n').forEach(line => {
+      scope.vars.split('\n').forEach((line) => {
         const parts = line.split(':');
         const _data = {
           variable: parts[0].trim(),

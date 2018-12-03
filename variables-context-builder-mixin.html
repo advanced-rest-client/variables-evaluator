@@ -343,6 +343,7 @@ ArcBehaviors.VariablesContextBuilderMixin = Polymer.dedupingMixin((base) => {
         let _res = this._prepareValue(line);
         if (_res === line) {
           _res = _res.replace(/'/g, '\\\'');
+          _res = _res.replace(/\\\\/, '\\\\\\');
           _res = '\'' + _res + '\'';
         }
         return _res;

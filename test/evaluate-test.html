@@ -249,6 +249,13 @@
           assert.isTrue('false' === result);
         });
       });
+
+      test('Double slash is preserved', function() {
+        return element.evaluateVariable('\\\\test\\\\')
+        .then(function(result) {
+          assert.equal(result, '\\\\test\\\\');
+        });
+      });
     });
 
     suite('evaluateVariables()', function() {
