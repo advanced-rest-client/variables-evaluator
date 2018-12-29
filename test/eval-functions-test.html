@@ -1,24 +1,11 @@
 <!doctype html>
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
-    <script src="../../iron-test-helpers/test-helpers.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
-
-    <!-- Step 1: import the element to test -->
+    <link rel="import" href="../../jexl/jexl.html">
     <link rel="import" href="../variables-evaluator.html">
   </head>
   <body>
@@ -30,47 +17,154 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </test-fixture>
 
     <script>
-    /* global suite, test, fixture, assert */
     suite('_evalFunctions()', function() {
-      var element;
+      let element;
       setup(function() {
         element = fixture('basic');
       });
 
+      test('Returns undefined when no argument', function() {
+        const result = element._evalFunctions();
+        assert.isUndefined(result);
+      });
+
       test('Should call now()', function() {
-        var result = element._evalFunctions('now()');
+        const result = element._evalFunctions('now()');
         assert.isFalse(isNaN(result));
       });
 
       test('Should call random()', function() {
-        var result = element._evalFunctions('random()');
+        const result = element._evalFunctions('random()');
         assert.isFalse(isNaN(result));
       });
 
       test('random() with groups', function() {
-        var result = element._evalFunctions('random(1) random(2) random(1)');
-        var items = result.split(' ');
+        const result = element._evalFunctions('random(1) random(2) random(1)');
+        const items = result.split(' ');
         assert.equal(items[0], items[2]);
       });
 
       test('Calls Math function', function() {
-        var result = element._evalFunctions('test Math.abs(-110)');
+        const result = element._evalFunctions('test Math.abs(-110)');
         assert.equal(result, 'test 110');
       });
 
       test('Calls String function', function() {
-        var result = element._evalFunctions('test String.toLowerCase(TEST)');
+        const result = element._evalFunctions('test String.toLowerCase(TEST)');
         assert.equal(result, 'test test');
       });
 
       test('Calls encodeURIComponent()', function() {
-        var result = element._evalFunctions('test encodeURIComponent(te s+t)');
+        const result = element._evalFunctions('test encodeURIComponent(te s+t)');
         assert.equal(result, 'test te%20s%2Bt');
       });
 
       test('Calls decodeURIComponent()', function() {
-        var result = element._evalFunctions('test decodeURIComponent(te%20s%2Bt)');
+        const result = element._evalFunctions('test decodeURIComponent(te%20s%2Bt)');
         assert.equal(result, 'test te s+t');
+      });
+    });
+
+    suite('_callFn()', function() {
+      let element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Throws when function do not exists', () => {
+        assert.throws(() => {
+          element._callFn('nonExisting');
+        });
+      });
+
+      test('Throws when namespace function do not exists', () => {
+        assert.throws(() => {
+          element._callFn('Something.nonExisting');
+        });
+      });
+
+      test('Calls now() function', () => {
+        const spy = sinon.spy(element, '__evalFnNow');
+        element._callFn('now');
+        assert.isTrue(spy.called);
+      });
+
+      test('Calls random() function', () => {
+        const spy = sinon.spy(element, '__evalFnRandom');
+        element._callFn('random');
+        assert.isTrue(spy.called);
+      });
+
+      test('Calls encodeURIComponent() function', () => {
+        const spy = sinon.spy(element, '__evalFnEncodeURIComponent');
+        element._callFn('encodeURIComponent', ['a']);
+        assert.isTrue(spy.called);
+      });
+
+      test('Calls decodeURIComponent() function', () => {
+        const spy = sinon.spy(element, '__evalFnDecodeURIComponent');
+        element._callFn('decodeURIComponent', ['a']);
+        assert.isTrue(spy.called);
+      });
+
+      test('Calls Math.xxx() function', () => {
+        const spy = sinon.spy(element, '_callNamespaceFunction');
+        element._callFn('Math.abs', [1]);
+        assert.isTrue(spy.called);
+        assert.equal(spy.args[0][0], 'Math', 'namespace is set');
+        assert.equal(spy.args[0][1], 'abs', 'function name is set');
+        assert.deepEqual(spy.args[0][2], [1], 'arguments is set');
+      });
+
+      test('Calls String.xxx() function', () => {
+        const spy = sinon.spy(element, '_callNamespaceFunction');
+        element._callFn('String.substr', ['test', 1]);
+        assert.isTrue(spy.called);
+        assert.equal(spy.args[0][0], 'String', 'namespace is set');
+        assert.equal(spy.args[0][1], 'substr', 'function name is set');
+        assert.typeOf(spy.args[0][2], 'array', 'arguments is set');
+      });
+
+      test('Calls JSON.xxx() function', () => {
+        const spy = sinon.spy(element, '_callNamespaceFunction');
+        element._callFn('JSON.parse', ['{}']);
+        assert.isTrue(spy.called);
+        assert.equal(spy.args[0][0], 'JSON', 'namespace is set');
+        assert.equal(spy.args[0][1], 'parse', 'function name is set');
+        assert.deepEqual(spy.args[0][2], ['{}'], 'arguments is set');
+      });
+    });
+
+    suite('_callNamespaceFunction()', () => {
+      let element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Returns undefined when namespace does not exist', () => {
+        const result = element._callNamespaceFunction('Something', 'fn', []);
+        assert.isUndefined(result);
+      });
+
+      test('Calls Math function', () => {
+        const result = element._callNamespaceFunction('Math', 'abs', [1]);
+        assert.equal(result, 1);
+      });
+
+      test('Calls JSON function', () => {
+        const result = element._callNamespaceFunction('JSON', 'stringify', [{}]);
+        assert.equal(result, '{}');
+      });
+
+      test('Calls String function', () => {
+        const result = element._callNamespaceFunction('String', 'substr', ['test', 1]);
+        assert.equal(result, 'est');
+      });
+
+      test('Throws when String function has no arguments', () => {
+        assert.throws(() => {
+          element._callNamespaceFunction('String', 'substr');
+        });
       });
     });
     </script>
