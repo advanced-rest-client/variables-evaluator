@@ -1,10 +1,10 @@
 {
-  "name": "@arc-components/variables-evaluator",
+  "name": "@advanced-rest-client/variables-evaluator",
   "version": "2.0.0-preview",
   "license": "Apache-2.0",
   "description": "Variables evaluator for the Advanced REST Client",
   "devDependencies": {
-    "@polymer/gen-typescript-declarations": "^1.5.1"
+    "@polymer/gen-typescript-declarations": "^1.6.0"
   },
   "private": false,
   "main": "variables-evaluator.html",

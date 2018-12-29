@@ -61,6 +61,45 @@
         return element.buildContext();
       });
 
+      test('Returns empty object when event is not handled', () => {
+        element.addEventListener('environment-current', function f(e) {
+          element.removeEventListener('environment-current', f);
+          e.stopPropagation();
+        });
+        return element.buildContext()
+        .then((result) => {
+          assert.typeOf(result, 'object');
+          assert.lengthOf(Object.keys(result), 0);
+        });
+      });
+
+      test('Returns empty object when variables are not set', () => {
+        element.addEventListener('environment-current', function f(e) {
+          element.removeEventListener('environment-current', f);
+          e.stopPropagation();
+          e.preventDefault();
+        });
+        return element.buildContext()
+        .then((result) => {
+          assert.typeOf(result, 'object');
+          assert.lengthOf(Object.keys(result), 0);
+        });
+      });
+
+      test('Returns empty object when has no variables', () => {
+        element.addEventListener('environment-current', function f(e) {
+          element.removeEventListener('environment-current', f);
+          e.stopPropagation();
+          e.preventDefault();
+          e.detail.variables = [];
+        });
+        return element.buildContext()
+        .then((result) => {
+          assert.typeOf(result, 'object');
+          assert.lengthOf(Object.keys(result), 0);
+        });
+      });
+
       test('Sets variable value', function() {
         return element.buildContext()
         .then(function(context) {
