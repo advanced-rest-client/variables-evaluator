@@ -1,3 +1,14 @@
+<a name="2.0.0"></a>
+# [2.0.0](https://github.com/advanced-rest-client/variables-evaluator/compare/0.2.1...2.0.0) (2018-12-29)
+
+
+### Fix
+
+* Fixes https://github.com/advanced-rest-client/arc-electron/issues/102 ([9fc4a2f73c35fe885a66b9c3237ebd6b79d3c4b3](https://github.com/advanced-rest-client/variables-evaluator/commit/9fc4a2f73c35fe885a66b9c3237ebd6b79d3c4b3))
+* Fixes https://github.com/advanced-rest-client/arc-electron/issues/63 ([fdd8179d3d2792c34b23a01ca85e1a29ea65b890](https://github.com/advanced-rest-client/variables-evaluator/commit/fdd8179d3d2792c34b23a01ca85e1a29ea65b890))
+
+
+
 <a name="1.0.0"></a>
 # [1.0.0](https://github.com/advanced-rest-client/variables-evaluator/compare/0.2.1...1.0.0) (2018-05-12)
 

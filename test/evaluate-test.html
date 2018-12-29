@@ -1,21 +1,12 @@
 <!doctype html>
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
     <link rel="import" href="../variables-evaluator.html">
+    <link rel="import" href="../../jexl/jexl.html">
   </head>
   <body>
 
@@ -26,12 +17,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </test-fixture>
 
     <script>
-    /* global fixture, assert */
     suite('evaluateVariable()', function() {
-      var element;
-      var contextFactory = function(e) {
+      let element;
+      const contextFactory = function(e) {
         e.preventDefault();
-        e.detail.value = [{
+        e.detail.variables = [{
           variable: 'test1',
           value: 'value1',
           enabled: true
@@ -55,11 +45,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       };
 
       suiteSetup(function() {
-        window.addEventListener('variable-list', contextFactory);
+        window.addEventListener('environment-current', contextFactory);
       });
 
       suiteTeardown(function() {
-        window.removeEventListener('variable-list', contextFactory);
+        window.removeEventListener('environment-current', contextFactory);
       });
 
       setup(function() {
@@ -85,7 +75,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       test('Evaluates JSON string', function() {
-        var str = '{\n"v1":"${test1}",\n\t"v2": "${test2}"\n}';
+        const str = '{\n"v1":"${test1}",\n\t"v2": "${test2}"\n}';
         return element.evaluateVariable(str)
         .then(function(result) {
           assert.equal(result, '{\n"v1":"value1",\n\t"v2": "value2 value1"\n}');
@@ -109,7 +99,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       test('Should evaluate legacy now function', function() {
         return element.evaluateVariable('test ${now}')
         .then(function(result) {
-          var now = result.split(' ')[1];
+          const now = result.split(' ')[1];
           assert.isFalse(isNaN(now));
         });
       });
@@ -117,7 +107,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       test('Should evaluate legacy now function with group', function() {
         return element.evaluateVariable('${now:1} ${now:2} ${now:1}')
         .then(function(result) {
-          var values = result.split(' ');
+          const values = result.split(' ');
           assert.isFalse(isNaN(values[0]));
           assert.equal(values[0], values[2]);
         });
@@ -126,7 +116,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       test('Should evaluate legacy random function', function() {
         return element.evaluateVariable('test ${random}')
         .then(function(result) {
-          var value = result.split(' ')[1];
+          const value = result.split(' ')[1];
           assert.isFalse(isNaN(value));
         });
       });
@@ -134,7 +124,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       test('Should evaluate legacy random function with group', function() {
         return element.evaluateVariable('${random:1} ${random:2} ${random:1}')
         .then(function(result) {
-          var values = result.split(' ');
+          const values = result.split(' ');
           assert.isFalse(isNaN(values[0]));
           assert.equal(values[0], values[2]);
           assert.notEqual(values[1], values[2]);
@@ -144,7 +134,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       test('Should evaluate now()', function() {
         return element.evaluateVariable('test now()')
         .then(function(result) {
-          var now = result.split(' ')[1];
+          const now = result.split(' ')[1];
           assert.isFalse(isNaN(now));
         });
       });
@@ -152,7 +142,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       test('Should evaluate now() with group', function() {
         return element.evaluateVariable('now(1) now(2) now(1)')
         .then(function(result) {
-          var values = result.split(' ');
+          const values = result.split(' ');
           assert.equal(values[0], values[2]);
         });
       });
@@ -160,7 +150,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       test('Should evaluate random()', function() {
         return element.evaluateVariable('test random()')
         .then(function(result) {
-          var now = result.split(' ')[1];
+          const now = result.split(' ')[1];
           assert.isFalse(isNaN(now));
         });
       });
@@ -168,7 +158,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       test('Should evaluate random() with group', function() {
         return element.evaluateVariable('random(1) random(2) random(1)')
         .then(function(result) {
-          var values = result.split(' ');
+          const values = result.split(' ');
           assert.equal(values[0], values[2]);
         });
       });
@@ -214,7 +204,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       test('Should not evalueate object', function() {
-        var obj = {'a': 'b'};
+        const obj = {'a': 'b'};
         return element.evaluateVariable(obj)
         .then(function(result) {
           assert.isTrue(obj === result);
@@ -222,7 +212,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       test('Should not evalueate FormData', function() {
-        var obj = new FormData();
+        const obj = new FormData();
         return element.evaluateVariable(obj)
         .then(function(result) {
           assert.isTrue(obj === result);
@@ -230,7 +220,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       test('Should not evalueate Blob', function() {
-        var obj = new Blob(['test']);
+        const obj = new Blob(['test']);
         return element.evaluateVariable(obj)
         .then(function(result) {
           assert.isTrue(obj === result);
@@ -238,7 +228,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       test('Should not evalueate null', function() {
-        var obj = null;
+        const obj = null;
         return element.evaluateVariable(obj)
         .then(function(result) {
           assert.isTrue(obj === result);
@@ -246,7 +236,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       test('Should evaluate numbers', function() {
-        var obj = 2;
+        const obj = 2;
         return element.evaluateVariable(obj)
         .then(function(result) {
           assert.isTrue('2' === result);
@@ -254,10 +244,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       test('Should evaluate booleans', function() {
-        var obj = false;
+        const obj = false;
         return element.evaluateVariable(obj)
         .then(function(result) {
           assert.isTrue('false' === result);
+        });
+      });
+
+      test('Double slash is preserved', function() {
+        return element.evaluateVariable('\\\\test\\\\')
+        .then(function(result) {
+          assert.equal(result, '\\\\test\\\\');
         });
       });
     });
@@ -266,7 +263,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       let element;
       const contextFactory = function(e) {
         e.preventDefault();
-        e.detail.value = [{
+        e.detail.variables = [{
           variable: 'test1',
           value: 'value1',
           enabled: true
@@ -295,11 +292,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var4: 'hello'
       };
       suiteSetup(function() {
-        window.addEventListener('variable-list', contextFactory);
+        window.addEventListener('environment-current', contextFactory);
       });
 
       suiteTeardown(function() {
-        window.removeEventListener('variable-list', contextFactory);
+        window.removeEventListener('environment-current', contextFactory);
       });
 
       setup(function() {
