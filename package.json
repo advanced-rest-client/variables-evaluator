@@ -1,23 +1,36 @@
 {
-  "name": "@advanced-rest-client/variables-evaluator",
-  "version": "2.0.0",
-  "license": "Apache-2.0",
   "description": "Variables evaluator for the Advanced REST Client",
-  "devDependencies": {
-    "@polymer/gen-typescript-declarations": "^1.6.0"
+  "keywords": [
+    "web-components",
+    "polymer"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/advanced-rest-client/variables-evaluator.git"
   },
-  "private": false,
-  "main": "variables-evaluator.html",
+  "name": "@advanced-rest-client/variables-evaluator",
+  "version": "3.0.0-preview.1",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@polymer/gen-typescript-declarations": "^1.6.0",
+    "@polymer/iron-component-page": "^4.0.0",
+    "@polymer/iron-demo-helpers": "^3.0.0",
+    "@polymer/iron-test-helpers": "^3.0.0",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "@polymer/paper-button": "^3.0.0",
+    "@polymer/test-fixture": "^4.0.2",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "sinon": "^7.2.3",
+    "wct-mocha": "^1.0.0"
+  },
+  "main": "variables-evaluator.js",
   "scripts": {
     "lint": "polymer lint variables-evaluator.html",
     "test-sauce": "polymer test --plugin sauce --job-name \"variables-evaluator:local-test\"",
     "test": "polymer test --plugin local",
     "update-deps": "npm update --quiet && bower update --quiet",
     "update-types": "gen-typescript-declarations --deleteExisting --outDir ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/advanced-rest-client/variables-evaluator.git"
   },
   "bugs": {
     "url": "https://github.com/advanced-rest-client/variables-evaluator/issues",
@@ -28,6 +41,8 @@
     "The Advanced REST client authors <arc@mulesoft.com>"
   ],
   "dependencies": {
-    "source-map-support": "^0.5.9"
-  }
+    "source-map-support": "^0.5.9",
+    "@polymer/polymer": "^3.0.0"
+  },
+  "author": "The Advanced REST client authors <arc@mulesoft.com>"
 }

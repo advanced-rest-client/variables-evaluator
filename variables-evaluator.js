@@ -1,4 +1,4 @@
-<!--
+/**
 @license
 Copyright 2018 The Advanced REST client authors <arc@mulesoft.com>
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -10,11 +10,11 @@ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
--->
-<link rel="import" href="../polymer/polymer-element.html">
-<link rel="import" href="../events-target-behavior/events-target-behavior.html">
-<link rel="import" href="variables-context-builder-mixin.html">
-<script>
+*/
+import { PolymerElement } from '../../@polymer/polymer/polymer-element.js';
+
+import { EventsTargetBehavior } from '../../events-target-behavior/events-target-behavior.js';
+import './variables-context-builder-mixin.js';
 /**
  * `<variables-evaluator>` Variables evaluator for the Advanced REST Client
  *
@@ -74,8 +74,8 @@ the License.
  * @appliesMixin ArcBehaviors.VariablesContextBuilderMixin
  * @appliesMixin ArcBehaviors.EventsTargetBehavior
  */
-class VariablesEvaluator extends ArcBehaviors.EventsTargetBehavior(
-  ArcBehaviors.VariablesContextBuilderMixin(Polymer.Element)) {
+class VariablesEvaluator extends EventsTargetBehavior(
+  ArcBehaviors.VariablesContextBuilderMixin(PolymerElement)) {
   static get is() {
     return 'variables-evaluator';
   }
@@ -215,4 +215,3 @@ class VariablesEvaluator extends ArcBehaviors.EventsTargetBehavior(
   }
 }
 window.customElements.define(VariablesEvaluator.is, VariablesEvaluator);
-</script>

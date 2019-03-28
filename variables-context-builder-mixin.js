@@ -1,5 +1,4 @@
-
-<!--
+/**
 @license
 Copyright 2018 The Advanced REST client authors <arc@mulesoft.com>
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -11,9 +10,9 @@ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
--->
-<link rel="import" href="../polymer/lib/utils/mixin.html">
-<script>
+*/
+import { dedupingMixin } from '../../@polymer/polymer/lib/utils/mixin.js';
+
 (function(global) {
 'use strict';
 if (!global.ArcBehaviors) {
@@ -66,7 +65,7 @@ class VariablesTokenizer {
  * @mixinFunction
  * @memberof ArcBehaviors
  */
-ArcBehaviors.VariablesContextBuilderMixin = Polymer.dedupingMixin((base) => {
+ArcBehaviors.VariablesContextBuilderMixin = dedupingMixin((base) => {
   /**
    * @polymer
    * @mixinClass
@@ -493,4 +492,3 @@ ArcBehaviors.VariablesContextBuilderMixin = Polymer.dedupingMixin((base) => {
   return AFmixin;
 });
 })(window);
-</script>
