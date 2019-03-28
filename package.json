@@ -41,7 +41,6 @@
     "The Advanced REST client authors <arc@mulesoft.com>"
   ],
   "dependencies": {
-    "source-map-support": "^0.5.9",
     "@polymer/polymer": "^3.0.0"
   },
   "author": "The Advanced REST client authors <arc@mulesoft.com>"
