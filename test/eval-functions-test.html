@@ -10,18 +10,19 @@
     <script src="../../../chai/chai.js"></script>
     <script src="../../../wct-mocha/wct-mocha.js"></script>
 
+    <script src="../dev-lib/jexl.min.js"></script>
   </head>
   <body>
 
     <test-fixture id="basic">
       <template>
-        <variables-evaluator></variables-evaluator>
+        <variables-evaluator jexl-path="ArcVariables.JexlDev"></variables-evaluator>
       </template>
     </test-fixture>
 
     <script type="module">
-    import '../../../jexl/jexl.js';
     import '../variables-evaluator.js';
+    import sinon from '../../../sinon/pkg/sinon-esm.js';
     suite('_evalFunctions()', function() {
       let element;
       setup(function() {

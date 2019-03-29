@@ -11,16 +11,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import { dedupingMixin } from '../../@polymer/polymer/lib/utils/mixin.js';
-
-(function(global) {
-'use strict';
-if (!global.ArcBehaviors) {
-  /**
-   * @namespace ArcBehaviors
-   */
-  global.ArcBehaviors = {};
-}
+import {dedupingMixin} from '../../@polymer/polymer/lib/utils/mixin.js';
 
 class VariablesTokenizer {
   constructor(value) {
@@ -63,9 +54,9 @@ class VariablesTokenizer {
  *
  * @polymer
  * @mixinFunction
- * @memberof ArcBehaviors
+ * @memberof ArcMixins
  */
-ArcBehaviors.VariablesContextBuilderMixin = dedupingMixin((base) => {
+export const VariablesContextBuilderMixin = dedupingMixin((base) => {
   /**
    * @polymer
    * @mixinClass
@@ -80,8 +71,50 @@ ArcBehaviors.VariablesContextBuilderMixin = dedupingMixin((base) => {
           }
         },
         // Cached context for current operation.
-        context: Object
+        context: Object,
+        // A cache object for groupping
+        cache: Object,
+        /**
+         * A reference name to the Jexl object.
+         * Use dot notation to access it from the `window` object.
+         * To set class pointer use `jexl` property.
+         */
+        jexlPath: String,
+        /**
+         * A Jexl class reference.
+         * If this value is set it must be a pointer to the Jexl class and
+         * `jexlPath` is ignored.
+         * This property is set automatically when `jexlPath` is processed.
+         */
+        jexl: Object
       };
+    }
+
+    get _jexl() {
+      if (!this.jexl) {
+        this.jexl = this._setupJexl();
+      }
+      return this.jexl;
+    }
+
+    _setupJexl() {
+      const ref = this.jexlPath;
+      if (!ref || typeof ref !== 'string') {
+        return;
+      }
+      const parts = ref.split('.');
+      const len = parts.length;
+      if (len === 1) {
+        return window[parts[0]];
+      }
+      let current = window;
+      for (let i = 0; i < len; i++) {
+        current = current[parts[i]];
+        if (!current) {
+          return;
+        }
+      }
+      return current;
     }
 
     /**
@@ -94,7 +127,7 @@ ArcBehaviors.VariablesContextBuilderMixin = dedupingMixin((base) => {
      * or to add temporary variables to the context. Values for keys that
      * exists in variables array (the `variable` property) will update value of
      * the variable. Rest is added to the list.
-     * @return {Promise} Promise resolved to a context to be passed to Jaxl.
+     * @return {Promise} Promise resolved to a context to be passed to Jexl.
      */
     buildContext(override) {
       if (!override) {
@@ -118,6 +151,12 @@ ArcBehaviors.VariablesContextBuilderMixin = dedupingMixin((base) => {
       }
       // Filter out disabled items
       variables = variables.filter((item) => item.enabled);
+      variables = this._overrideContext(variables, override);
+      return this._processContextVariables(result, variables);
+    }
+
+    _overrideContext(variables, override) {
+      override = Object.assign({}, override);
       variables = variables.map((item) => {
         if (item.variable in override) {
           item.value = override[item.variable];
@@ -131,7 +170,19 @@ ArcBehaviors.VariablesContextBuilderMixin = dedupingMixin((base) => {
           value: override[key]
         });
       });
-      return this._processContextVariables(result, variables);
+      return variables;
+    }
+
+    _overrideContextPost(context, override) {
+      if (!context || !override) {
+        return context;
+      }
+      override = Object.assign({}, override);
+      context = Object.assign({}, context);
+      Object.entries(override).forEach(([key, value]) => {
+        context[key] = value;
+      });
+      return context;
     }
 
     _processContextVariables(result, variables, requireEvaluation, runCount) {
@@ -165,15 +216,27 @@ ArcBehaviors.VariablesContextBuilderMixin = dedupingMixin((base) => {
       });
     }
 
+    _processContextVariablesPost(variables) {
+      const tmp = [];
+      Object.entries(variables).forEach(([key, value]) => {
+        tmp[tmp.length] = {
+          variable: key,
+          value
+        };
+      });
+      return this._processContextVariables({}, tmp);
+    }
+
     /**
      * Evaluates a value against a variables.
      *
      * @param {String} value A value to evaluate
      * @param {?Object} context Optional. Context for Jexl. If not set it will
      * get a context from variables manager.
+     * @param {?Object} override A list of variables to override in created context.
      * @return {Promise} Promise that resolves to evaluated value.
      */
-    evaluateVariable(value, context) {
+    evaluateVariable(value, context, override) {
       const typeOf = typeof value;
       // Non primitives + null
       if (typeOf === 'object') {
@@ -183,12 +246,16 @@ ArcBehaviors.VariablesContextBuilderMixin = dedupingMixin((base) => {
         value = String(value);
       }
       let promise;
+      context = context || this.context;
       if (context) {
-        promise = Promise.resolve(context);
-      } else if (this.context) {
-        promise = Promise.resolve(this.context);
+        if (override) {
+          context = this._overrideContextPost(context, override);
+          promise = this._processContextVariablesPost(context);
+        } else {
+          promise = Promise.resolve(context);
+        }
       } else {
-        promise = this.buildContext();
+        promise = this.buildContext(override);
       }
       return promise
       .then((context) => this._evaluateWithContext(context, value));
@@ -211,15 +278,8 @@ ArcBehaviors.VariablesContextBuilderMixin = dedupingMixin((base) => {
         return Promise.reject(e);
       }
       if (!this._jexl) {
-        if (typeof window.Jexl !== 'undefined') {
-          this._jexl = window.Jexl;
-        } else {
-          try {
-            this._jexl = require('Jexl');
-          } catch (e) {
-            return Promise.reject(e);
-          }
-        }
+        console.warn('Jexl library has not been initialized.');
+        return Promise.resolve(value);
       }
       if (value instanceof Array) {
         const ps = value.map((item) => this._jexl.eval(item, context));
@@ -466,6 +526,8 @@ ArcBehaviors.VariablesContextBuilderMixin = dedupingMixin((base) => {
      * Returns a random `int` between 0 (inclusive) and
      * `Number.MAX_SAFE_INTEGER` (exclusive) with roughly equal probability of
      * returning any particular `int` in this range.
+     *
+     * @return {Number}
      */
     __randomInt() {
       // "|0" forces the value to a 32 bit integer.
@@ -488,7 +550,39 @@ ArcBehaviors.VariablesContextBuilderMixin = dedupingMixin((base) => {
       }
       return decodeURIComponent(value);
     }
+
+    /**
+     * Finds cached group.
+     *
+     * @param {String} key A key where a function keeps cached objects
+     * @param {String} group Group name. Defined by user as an argument.
+     * @return {String} Cached value.
+     */
+    _findInCache(key, group) {
+      if (!this.cache) {
+        return;
+      }
+      if (!this.cache[key]) {
+        return;
+      }
+      return this.cache[key][group];
+    }
+    /**
+     * Stores value in cache.
+     *
+     * @param {String} key A key where a function keeps cached objects
+     * @param {String} group Group name. Defined by user as an argument.
+     * @param {String} value Cached value.
+     */
+    _storeCache(key, group, value) {
+      if (!this.cache) {
+        this.cache = {};
+      }
+      if (!this.cache[key]) {
+        this.cache[key] = {};
+      }
+      this.cache[key][group] = value;
+    }
   }
   return AFmixin;
 });
-})(window);

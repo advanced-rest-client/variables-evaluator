@@ -4,44 +4,41 @@
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
   <title>variables-manager demo</title>
   <script src="../../../@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+  <script src="../dev-lib/jexl.min.js"></script>
+
   <script type="module" src="../../../@webcomponents/shadycss/entrypoints/apply-shim.js"></script>
   <script type="module" src="../../../@polymer/polymer/lib/elements/custom-style.js"></script>
   <script type="module" src="../../../@polymer/polymer/lib/elements/dom-bind.js"></script>
   <script type="module" src="../../../@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
   <script type="module" src="../../../@polymer/paper-button/paper-button.js"></script>
-  <script type="module" src="../../../jexl/jexl.js"></script>
   <script type="module" src="../variables-evaluator.js"></script>
-  <script type="module">
-const $_documentContainer = document.createElement('template');
 
-$_documentContainer.innerHTML = `<custom-style>
+  <custom-style>
     <style is="custom-style" include="demo-pages-shared-styles">
     output {
       display: block;
       white-space: pre-wrap;
     }
     </style>
-  </custom-style>`;
-
-document.body.appendChild($_documentContainer.content);
-</script>
+  </custom-style>
 </head>
 <body unresolved="">
-  <script type="module">
-const $_documentContainer = document.createElement('template');
-
-$_documentContainer.innerHTML = `<dom-bind id="app">
+  <dom-bind id="app">
     <template is="dom-bind">
       <section class="vertical-section-container centered" role="main">
-        <h3>The \`variables-evaluator\`</h3>
-        <variables-evaluator id="evaluator"></variables-evaluator>
-
+        <h3>The variables-evaluator</h3>
+        <variables-evaluator id="evaluator" jexl-path="ArcVariables.JexlDev"></variables-evaluator>
         <fieldset>
           <div>
             <legend>Input data</legend>
             <label for="vars" id="varsLabel">Variables</label>
-            <p class="desc" id="varsDesc">Add variables in each line using ":" as a delimiter between name and the value</p>
+            <p class="desc" id="varsDesc">Add variables in each line using ":" as a delimiter between name and the value. This variables are going to be used in events API (environment-current event)</p>
             <textarea name="variables" id="vars" rows="8" cols="80" aria-labelledby="varsLabel" aria-describedby="varsDesc" value="{{vars::input}}"></textarea>
+          </div>
+          <div>
+            <label for="oVars" id="overrideLabel">Variables</label>
+            <p class="desc" id="oVarsDesc">Variables defined here will be passed to eval function to override variables from previous input</p>
+            <textarea name="variables" id="oVars" rows="8" cols="80" aria-labelledby="overrideLabel" aria-describedby="oVarsDesc" value="{{oVars::input}}"></textarea>
           </div>
           <div>
             <label for="vars" id="varsLabel">Value</label>
@@ -55,65 +52,75 @@ $_documentContainer.innerHTML = `<dom-bind id="app">
         <output>[[evalResult]]</output>
       </section>
     </template>
-  </dom-bind>`;
+  </dom-bind>
+  <script>
+    (function(scope) {
+      scope.evalResult = '';
+      scope.val = `{
+  "hello-world": "\${variable} \${otherVariable}",
+  "regex1": "^([\\\\w][\\\\w\\\\s\\\\-]*[\\\\w]|[\\\\w])$",
+  "function": "now()"
+}`;
+      scope.vars = 'variable: my test value\notherVariable: other value';
+      scope.oVars = 'otherVariable: updated value';
 
-document.body.appendChild($_documentContainer.content);
-</script>
-  <script type="module">
-import '../../../@webcomponents/shadycss/entrypoints/apply-shim.js';
-import '../../../@polymer/polymer/lib/elements/custom-style.js';
-import '../../../@polymer/polymer/lib/elements/dom-bind.js';
-import '../../../@polymer/iron-demo-helpers/demo-pages-shared-styles.js';
-import '../../../@polymer/paper-button/paper-button.js';
-import '../../../jexl/jexl.js';
-import '../variables-evaluator.js';
-(function(scope) {
-  scope.evalResult = '';
-  scope.val = '{\n\t"hello-world": "${variable}"\n\t"regex1": "^([\\\\w][\\\\w\\\\s\\\\-]*[\\\\w]|[\\\\w])$",\n\t"function": "now()"\n}';
-  scope.vars = 'variable: my test value\notherVariable: other value';
-
-  scope._eval = function() {
-    const element = document.getElementById('evaluator');
-    element.cache = undefined;
-    element.context = undefined;
-    element.evaluateVariable(scope.val)
-    .then(function(result) {
-      scope.evalResult = result;
-    })
-    .catch(function(cause) {
-      scope.evalResult = cause.message;
-      console.error(cause);
-    });
-  };
-
-  scope.getVariables = function() {
-    const result = [];
-    if (!scope.vars) {
-      return result;
-    }
-    scope.vars.split('\n').forEach((line) => {
-      const parts = line.split(':');
-      const _data = {
-        variable: parts[0].trim(),
-        enabled: true,
-        value: ''
+      scope.processVarString = function(str) {
+        const result = [];
+        str.split('\n').forEach((line) => {
+          line = line.trim();
+          if (!line) {
+            return;
+          }
+          const parts = line.split(':');
+          const _data = {
+            variable: parts[0].trim(),
+            enabled: true,
+            value: ''
+          };
+          if (parts[1]) {
+            _data.value = parts[1].trim();
+          }
+          result.push(_data);
+        });
+        return result;
       };
-      if (parts[1]) {
-        _data.value = parts[1].trim();
-      }
-      result.push(_data);
-    });
-    return result;
-  };
 
-  window.addEventListener('variable-list', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.detail.value = scope.getVariables();
-    e.detail.environment = 'default';
-  });
-})(document.getElementById('app'));
-</script>
+      scope.processOverrideString = function(str) {
+        const result = {};
+        str.split('\n').forEach((line) => {
+          line = line.trim();
+          if (!line) {
+            return;
+          }
+          const parts = line.split(':');
+          const name = parts[0].trim();
+          const value = parts[1] ? parts[1].trim() : '';
+          result[name] = value;
+        });
+        return result;
+      };
 
+      scope._eval = function() {
+        const element = document.getElementById('evaluator');
+        element.cache = undefined;
+        element.context = undefined;
+        element.evaluateVariable(scope.val, undefined, scope.processOverrideString(scope.oVars))
+        .then(function(result) {
+          scope.evalResult = result;
+        })
+        .catch(function(cause) {
+          scope.evalResult = cause.message;
+          console.error(cause);
+        });
+      };
 
-</body></html>
+      window.addEventListener('environment-current', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.detail.variables = scope.processVarString(scope.vars);
+        e.detail.environment = 'default';
+      });
+    })(document.getElementById('app'));
+    </script>
+  </body>
+</html>

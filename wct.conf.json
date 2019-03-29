@@ -60,7 +60,8 @@
       "exclude": [
         "**/test/**",
         "**/demo/**",
-        "**/tasks/**"
+        "**/tasks/**",
+        "**/dev-lib/**"
       ],
       "thresholds": {
         "global": {

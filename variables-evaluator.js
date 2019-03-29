@@ -11,10 +11,9 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import { PolymerElement } from '../../@polymer/polymer/polymer-element.js';
-
-import { EventsTargetBehavior } from '../../events-target-behavior/events-target-behavior.js';
-import './variables-context-builder-mixin.js';
+import {PolymerElement} from '../../@polymer/polymer/polymer-element.js';
+import {EventsTargetMixin} from '../../@advanced-rest-client/events-target-mixin/events-target-mixin.js';
+import {VariablesContextBuilderMixin} from './variables-context-builder-mixin.js';
 /**
  * `<variables-evaluator>` Variables evaluator for the Advanced REST Client
  *
@@ -71,18 +70,15 @@ import './variables-context-builder-mixin.js';
  * @customElement
  * @polymer
  * @demo demo/index.html
- * @appliesMixin ArcBehaviors.VariablesContextBuilderMixin
- * @appliesMixin ArcBehaviors.EventsTargetBehavior
+ * @appliesMixin VariablesContextBuilderMixin
+ * @appliesMixin EventsTargetBehavior
  */
-class VariablesEvaluator extends EventsTargetBehavior(
-  ArcBehaviors.VariablesContextBuilderMixin(PolymerElement)) {
+class VariablesEvaluator extends EventsTargetMixin(VariablesContextBuilderMixin(PolymerElement)) {
   static get is() {
     return 'variables-evaluator';
   }
   static get properties() {
     return {
-      // A cache object for groupping
-      cache: Object,
       // If set it will not handle `before-request` event
       noBeforeRequest: Boolean
     };
@@ -180,38 +176,6 @@ class VariablesEvaluator extends EventsTargetBehavior(
     .catch(function(cause) {
       reject(cause);
     });
-  }
-  /**
-   * Finds cached group.
-   *
-   * @param {String} key A key where a function keeps cached objects
-   * @param {String} group Group name. Defined by user as an argument.
-   * @return {String} Cached value.
-   */
-  _findInCache(key, group) {
-    if (!this.cache) {
-      return;
-    }
-    if (!this.cache[key]) {
-      return;
-    }
-    return this.cache[key][group];
-  }
-  /**
-   * Stores value in cache.
-   *
-   * @param {String} key A key where a function keeps cached objects
-   * @param {String} group Group name. Defined by user as an argument.
-   * @param {String} value Cached value.
-   */
-  _storeCache(key, group, value) {
-    if (!this.cache) {
-      this.cache = {};
-    }
-    if (!this.cache[key]) {
-      this.cache[key] = {};
-    }
-    this.cache[key][group] = value;
   }
 }
 window.customElements.define(VariablesEvaluator.is, VariablesEvaluator);
