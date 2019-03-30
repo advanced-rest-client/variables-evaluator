@@ -5,16 +5,23 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   variables-context-builder-mixin.html
+ *   variables-context-builder-mixin.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
 
-/// <reference path="../polymer/types/lib/utils/mixin.d.ts" />
+declare class VariablesTokenizer {
+  constructor(value: any);
+  next(): any;
+  nextUntil(char: any): any;
+  eof(): any;
+}
 
-declare namespace ArcBehaviors {
+export {VariablesContextBuilderMixin};
+
+declare namespace ArcMixins {
 
 
   /**
@@ -31,12 +38,34 @@ declare namespace ArcBehaviors {
   }
 
   interface VariablesContextBuilderMixin {
+    readonly _jexl: any;
     functionRegex: RegExp|null|undefined;
 
     /**
      * Cached context for current operation.
      */
     context: object|null|undefined;
+
+    /**
+     * A cache object for groupping
+     */
+    cache: object|null|undefined;
+
+    /**
+     * A reference name to the Jexl object.
+     * Use dot notation to access it from the `window` object.
+     * To set class pointer use `jexl` property.
+     */
+    jexlPath: string|null|undefined;
+
+    /**
+     * A Jexl class reference.
+     * If this value is set it must be a pointer to the Jexl class and
+     * `jexlPath` is ignored.
+     * This property is set automatically when `jexlPath` is processed.
+     */
+    jexl: object|null|undefined;
+    _setupJexl(): any;
 
     /**
      * Requests for a variables list from the variables manager
@@ -48,10 +77,13 @@ declare namespace ArcBehaviors {
      * or to add temporary variables to the context. Values for keys that
      * exists in variables array (the `variable` property) will update value of
      * the variable. Rest is added to the list.
-     * @returns Promise resolved to a context to be passed to Jaxl.
+     * @returns Promise resolved to a context to be passed to Jexl.
      */
     buildContext(override: object|null): Promise<any>|null;
+    _overrideContext(variables: any, override: any): any;
+    _overrideContextPost(context: any, override: any): any;
     _processContextVariables(result: any, variables: any, requireEvaluation: any, runCount: any): any;
+    _processContextVariablesPost(variables: any): any;
 
     /**
      * Evaluates a value against a variables.
@@ -59,9 +91,10 @@ declare namespace ArcBehaviors {
      * @param value A value to evaluate
      * @param context Optional. Context for Jexl. If not set it will
      * get a context from variables manager.
+     * @param override A list of variables to override in created context.
      * @returns Promise that resolves to evaluated value.
      */
-    evaluateVariable(value: String|null, context: object|null): Promise<any>|null;
+    evaluateVariable(value: String|null, context: object|null, override: object|null): Promise<any>|null;
     _evaluateWithContext(context: any, value: any): any;
 
     /**
@@ -121,12 +154,25 @@ declare namespace ArcBehaviors {
      */
     _callNamespaceFunction(namespace: any, fn: Function|null, args: any): any;
     _applyArgumentsContext(arg: any, context: any): any;
+
+    /**
+     * Finds cached group.
+     *
+     * @param key A key where a function keeps cached objects
+     * @param group Group name. Defined by user as an argument.
+     * @returns Cached value.
+     */
+    _findInCache(key: String|null, group: String|null): String|null;
+
+    /**
+     * Stores value in cache.
+     *
+     * @param key A key where a function keeps cached objects
+     * @param group Group name. Defined by user as an argument.
+     * @param value Cached value.
+     */
+    _storeCache(key: String|null, group: String|null, value: String|null): void;
   }
 }
 
-declare class VariablesTokenizer {
-  constructor(value: any);
-  next(): any;
-  nextUntil(char: any): any;
-  eof(): any;
-}
+export {VariablesContextBuilderMixinConstructor};

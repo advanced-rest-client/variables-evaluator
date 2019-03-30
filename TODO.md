@@ -1,2 +1,0 @@
-- JEXL as a library to be included outside the project (not a dependency of this one)
-- Support for overriding variables when evaluating (will support variables defined on request/workspace/project level)
