@@ -32,14 +32,13 @@
       (node || document).dispatchEvent(e);
       return e;
     }
-    suite('evaluateVariable()', function() {
+    suite('before-request event', function() {
       let element;
       const request = {
         'url': 'https://test.com?q=${test1}',
         'headers': 'x-test: ${test2}\nx-test2: ${test3}',
         'method': '${test3}',
-        'payload': '${test4}',
-        'promises': []
+        'payload': '${test4}'
       };
 
       const contextFactory = function(e) {
@@ -79,18 +78,24 @@
         element = fixture('basic');
       });
 
+      function getRequest(req) {
+        const r = Object.assign({}, req || request);
+        r.promises = [];
+        return r;
+      }
+
       test('Should return promise', function() {
-        const e = fire('before-request', Object.assign({}, request));
+        const e = fire('before-request', getRequest());
         assert.typeOf(e.detail.promises[0], 'promise');
       });
 
       test('Should not be cancelled', function() {
-        const e = fire('before-request', Object.assign({}, request));
+        const e = fire('before-request', getRequest());
         assert.isFalse(e.defaultPrevented);
       });
 
       test('Should evaluate URL', function() {
-        const e = fire('before-request', Object.assign({}, request));
+        const e = fire('before-request', getRequest());
         return e.detail.promises[0]
         .then(function(result) {
           assert.equal(result.url, 'https://test.com?q=value1');
@@ -98,7 +103,7 @@
       });
 
       test('Should evaluate headers', function() {
-        const e = fire('before-request', Object.assign({}, request));
+        const e = fire('before-request', getRequest());
         return e.detail.promises[0]
         .then(function(result) {
           assert.equal(result.headers, 'x-test: value2 value1\nx-test2: value3 value4');
@@ -106,7 +111,7 @@
       });
 
       test('Should evaluate method', function() {
-        const e = fire('before-request', Object.assign({}, request));
+        const e = fire('before-request', getRequest());
         return e.detail.promises[0]
         .then(function(result) {
           assert.equal(result.method, 'value3 value4');
@@ -114,7 +119,7 @@
       });
 
       test('Should evaluate payload', function() {
-        const e = fire('before-request', Object.assign({}, request));
+        const e = fire('before-request', getRequest());
         return e.detail.promises[0]
         .then(function(result) {
           assert.equal(result.payload, 'value4');
@@ -128,7 +133,7 @@
           method: 'GET',
           promises: []
         };
-        const e = fire('before-request', Object.assign({}, request));
+        const e = fire('before-request', getRequest(request));
         return e.detail.promises[0]
         .then(function(result) {
           assert.isUndefined(result.payload);
@@ -141,10 +146,30 @@
           method: 'GET',
           promises: []
         };
-        const e = fire('before-request', Object.assign({}, request));
+        const e = fire('before-request', getRequest(request));
         return e.detail.promises[0]
         .then(function(result) {
           assert.isUndefined(result.headers);
+        });
+      });
+
+      test('Ignores event when noBeforeRequest', function() {
+        element.noBeforeRequest = true;
+        const e = fire('before-request', getRequest());
+        assert.lengthOf(e.detail.promises, 0);
+      });
+
+      test('Uses variables from request config', function() {
+        const request = getRequest();
+        request.config = {
+          variables: {
+            test1: 'other-value'
+          }
+        };
+        const e = fire('before-request', request);
+        return e.detail.promises[0]
+        .then(function(result) {
+          assert.equal(result.url, 'https://test.com?q=other-value');
         });
       });
     });

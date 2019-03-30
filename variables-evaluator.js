@@ -74,9 +74,6 @@ import {VariablesContextBuilderMixin} from './variables-context-builder-mixin.js
  * @appliesMixin EventsTargetBehavior
  */
 class VariablesEvaluator extends EventsTargetMixin(VariablesContextBuilderMixin(PolymerElement)) {
-  static get is() {
-    return 'variables-evaluator';
-  }
   static get properties() {
     return {
       // If set it will not handle `before-request` event
@@ -166,21 +163,18 @@ class VariablesEvaluator extends EventsTargetMixin(VariablesContextBuilderMixin(
     }
     e.preventDefault();
     e.stopPropagation();
-    e.detail.result = new Promise(function(value, resolve, reject) {
+    const {value, override, context} = e.detail;
+    e.detail.result = new Promise((resolve, reject) => {
       this.cache = undefined;
       this.context = undefined;
-      this._processVariableEvaluation(value, resolve, reject);
-    }.bind(this, e.detail.value));
-  }
-
-  _processVariableEvaluation(value, resolve, reject) {
-    return this.evaluateVariable(value)
-    .then(function(result) {
-      resolve(result);
-    })
-    .catch(function(cause) {
-      reject(cause);
+      this._processVariableEvaluation(value, override, context, resolve, reject);
     });
   }
+
+  _processVariableEvaluation(value, override, context, resolve, reject) {
+    return this.evaluateVariable(value, context, override)
+    .then((result) => resolve(result))
+    .catch((cause) => reject(cause));
+  }
 }
-window.customElements.define(VariablesEvaluator.is, VariablesEvaluator);
+window.customElements.define('variables-evaluator', VariablesEvaluator);
