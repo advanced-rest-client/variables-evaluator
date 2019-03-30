@@ -69,6 +69,31 @@ e.detail.result.then((value) => {
 });
 ```
 
+## Jexl dependency
+
+Previous versions of this component included Jexl library. This version do not have
+Jexl as a dependency but it is required to run the component.
+
+You must install [Jexl](https://github.com/TomFrost/Jexl) on your project, and build it for browser.
+See `dev-lib/` folder for an example of such build.
+
+Finally you have to either pass the pointer to Jexl library to `jexl` property
+or point to a pointer relative to the `window` object.
+
+Setting Jexl pointer:
+
+```javascript
+const eval = document.querySelector('variables-evaluator');
+eval.jexl = myJexlVariable;
+```
+
+Setting path to Jexl:
+
+```html
+<variables-evaluator jexl-path="ArcVariables.JexlDev"></variables-evaluator>
+```
+This expects the Jexl library to be under `window.ArcVariables.JexlDev` variable.
+
 ### API components
 
 This components is a part of [API components ecosystem](https://elements.advancedrestclient.com/)
@@ -90,7 +115,7 @@ npm install --save @advanced-rest-client/variables-evaluator
     </script>
   </head>
   <body>
-    <variables-evaluator value="2"></variables-evaluator>
+    <variables-evaluator></variables-evaluator>
   </body>
 </html>
 ```
