@@ -119,6 +119,11 @@ class VariablesEvaluator extends EventsTargetMixin(VariablesContextBuilderMixin(
    * @return {Promise} Promise resolved to a request object.
    */
   processBeforeRequest(request, override) {
+    if (!override) {
+      if (request.config && request.config.variables) {
+        override = request.config.variables;
+      }
+    }
     return new Promise((resolve, reject) => {
       this.cache = undefined;
       this.context = undefined;
