@@ -1,18 +1,19 @@
-<!DOCTYPE html><html><head>
+<!DOCTYPE html>
+<html>
+
+<head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
   <title>variables-manager demo</title>
   <script src="../../../@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
   <script src="../dev-lib/jexl.min.js"></script>
-
   <script type="module" src="../../../@webcomponents/shadycss/entrypoints/apply-shim.js"></script>
   <script type="module" src="../../../@polymer/polymer/lib/elements/custom-style.js"></script>
   <script type="module" src="../../../@polymer/polymer/lib/elements/dom-bind.js"></script>
   <script type="module" src="../../../@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
   <script type="module" src="../../../@polymer/paper-button/paper-button.js"></script>
   <script type="module" src="../variables-evaluator.js"></script>
-
   <custom-style>
     <style is="custom-style" include="demo-pages-shared-styles">
     output {
@@ -22,6 +23,7 @@
     </style>
   </custom-style>
 </head>
+
 <body unresolved="">
   <dom-bind id="app">
     <template is="dom-bind">
@@ -47,64 +49,63 @@
           </div>
           <paper-button raised="" on-tap="_eval">Evaluate</paper-button>
         </fieldset>
-
         <h3>Eval result</h3>
         <output>[[evalResult]]</output>
       </section>
     </template>
   </dom-bind>
   <script>
-    (function(scope) {
-      scope.evalResult = '';
-      scope.val = `{
+  (function(scope) {
+    scope.evalResult = '';
+    scope.val = `{
   "hello-world": "\${variable} \${otherVariable}",
   "regex1": "^([\\\\w][\\\\w\\\\s\\\\-]*[\\\\w]|[\\\\w])$",
   "function": "now()"
 }`;
-      scope.vars = 'variable: my test value\notherVariable: other value';
-      scope.oVars = 'otherVariable: updated value';
+    scope.vars = 'variable: my test value\notherVariable: other value';
+    scope.oVars = 'otherVariable: updated value';
 
-      scope.processVarString = function(str) {
-        const result = [];
-        str.split('\n').forEach((line) => {
-          line = line.trim();
-          if (!line) {
-            return;
-          }
-          const parts = line.split(':');
-          const _data = {
-            variable: parts[0].trim(),
-            enabled: true,
-            value: ''
-          };
-          if (parts[1]) {
-            _data.value = parts[1].trim();
-          }
-          result.push(_data);
-        });
-        return result;
-      };
+    scope.processVarString = function(str) {
+      const result = [];
+      str.split('\n').forEach((line) => {
+        line = line.trim();
+        if (!line) {
+          return;
+        }
+        const parts = line.split(':');
+        const _data = {
+          variable: parts[0].trim(),
+          enabled: true,
+          value: ''
+        };
+        if (parts[1]) {
+          _data.value = parts[1].trim();
+        }
+        result.push(_data);
+      });
+      return result;
+    };
 
-      scope.processOverrideString = function(str) {
-        const result = {};
-        str.split('\n').forEach((line) => {
-          line = line.trim();
-          if (!line) {
-            return;
-          }
-          const parts = line.split(':');
-          const name = parts[0].trim();
-          const value = parts[1] ? parts[1].trim() : '';
-          result[name] = value;
-        });
-        return result;
-      };
+    scope.processOverrideString = function(str) {
+      const result = {};
+      str.split('\n').forEach((line) => {
+        line = line.trim();
+        if (!line) {
+          return;
+        }
+        const parts = line.split(':');
+        const name = parts[0].trim();
+        const value = parts[1] ? parts[1].trim() : '';
+        result[name] = value;
+      });
+      return result;
+    };
 
-      scope._eval = function() {
-        const element = document.getElementById('evaluator');
-        element.cache = undefined;
-        element.context = undefined;
-        element.evaluateVariable(scope.val, undefined, scope.processOverrideString(scope.oVars))
+    scope._eval = function() {
+      const element = document.getElementById('evaluator');
+      element.cache = undefined;
+      element.context = undefined;
+      element.evaluateVariable(scope.val, undefined, scope.processOverrideString(scope.oVars))
         .then(function(result) {
           scope.evalResult = result;
         })
@@ -112,15 +113,16 @@
           scope.evalResult = cause.message;
           console.error(cause);
         });
-      };
+    };
 
-      window.addEventListener('environment-current', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.detail.variables = scope.processVarString(scope.vars);
-        e.detail.environment = 'default';
-      });
-    })(document.getElementById('app'));
-    </script>
-  </body>
+    window.addEventListener('environment-current', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.detail.variables = scope.processVarString(scope.vars);
+      e.detail.environment = 'default';
+    });
+  })(document.getElementById('app'));
+  </script>
+</body>
+
 </html>
