@@ -9,3 +9,4 @@ bower.json
 .travis.yml
 index.html
 polymer.json
+web_modules

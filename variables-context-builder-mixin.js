@@ -277,18 +277,25 @@ export const VariablesContextBuilderMixin = dedupingMixin((base) => {
       } catch (e) {
         return Promise.reject(e);
       }
-      if (!this._jexl) {
+      const JxRef = this._jexl;
+      if (!JxRef) {
         console.warn('Jexl library has not been initialized.');
         return Promise.resolve(value);
       }
+      let jexl;
+      if (!JxRef.eval && JxRef.constructor) {
+        jexl = new JxRef();
+      } else {
+        jexl = JxRef;
+      }
       if (value instanceof Array) {
-        const ps = value.map((item) => this._jexl.eval(item, context));
+        const ps = value.map((item) => jexl.eval(item, context));
         return Promise.all(ps)
         .then((result) => result.join('\n'));
       } else {
-        return this._jexl.eval(value, context);
+        return jexl.eval(value, context);
       }
-      return this._jexl.eval(value, context);
+      return jexl.eval(value, context);
     }
     /**
      * Recursively evaluate variables on an object.

@@ -14,6 +14,7 @@
   "devDependencies": {
     "@babel/core": "^7.4.0",
     "@babel/preset-env": "^7.4.2",
+    "@pika/web": "^0.4.2",
     "@polymer/gen-typescript-declarations": "^1.6.0",
     "@polymer/iron-component-page": "^4.0.0",
     "@polymer/iron-demo-helpers": "^3.0.0",
@@ -38,7 +39,7 @@
     "test": "polymer test --plugin local",
     "update-deps": "npm update --quiet && bower update --quiet",
     "update-types": "gen-typescript-declarations --deleteExisting --outDir .",
-    "prepare": "node dev-lib/prepare.js"
+    "prepare": "pika-web && node dev-lib/prepare.js"
   },
   "bugs": {
     "url": "https://github.com/advanced-rest-client/variables-evaluator/issues",
@@ -52,5 +53,10 @@
     "@advanced-rest-client/events-target-mixin": "^3.0.0-preview.2",
     "@polymer/polymer": "^3.0.0"
   },
-  "author": "The Advanced REST client authors <arc@mulesoft.com>"
+  "author": "The Advanced REST client authors <arc@mulesoft.com>",
+  "@pika/web": {
+    "webDependencies": [
+      "jexl/lib/Jexl.js"
+    ]
+  }
 }

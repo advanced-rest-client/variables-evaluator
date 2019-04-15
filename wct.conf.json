@@ -61,7 +61,8 @@
         "**/test/**",
         "**/demo/**",
         "**/tasks/**",
-        "**/dev-lib/**"
+        "**/dev-lib/**",
+        "web_modules/**"
       ],
       "thresholds": {
         "global": {
