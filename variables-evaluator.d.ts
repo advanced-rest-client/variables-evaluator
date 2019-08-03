@@ -12,6 +12,10 @@
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
 
+import {LitElement} from 'lit-element';
+
+import {EventsTargetMixin} from '@advanced-rest-client/events-target-mixin/events-target-mixin.js';
+
 import {VariablesContextBuilderMixin} from './variables-context-builder-mixin.js';
 
 declare namespace LogicElements {
@@ -77,6 +81,7 @@ declare namespace LogicElements {
      * If set it will not handle `before-request` event
      */
     noBeforeRequest: boolean|null|undefined;
+    connectedCallback(): void;
     _attachListeners(node: any): void;
     _detachListeners(node: any): void;
     _beforeRequestHandler(e: any): void;
@@ -94,9 +99,8 @@ declare namespace LogicElements {
      * @returns Promise resolved to a request object.
      */
     processBeforeRequest(request: object|null, override: object|null): Promise<any>|null;
-    _processBeforeRequest(request: any, override: any, resolve: any, reject: any): any;
+    _processBeforeRequest(request: any, override: any): any;
     _evaluateVariableHandler(e: any): void;
-    _processVariableEvaluation(value: any, override: any, context: any, resolve: any, reject: any): any;
   }
 }
 

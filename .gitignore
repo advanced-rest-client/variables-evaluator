@@ -55,8 +55,6 @@ $RECYCLE.BIN/
 .nfs*
 
 node_modules
-build
-dist
 coverage
 dev-lib/jexl.min.js
 web_modules

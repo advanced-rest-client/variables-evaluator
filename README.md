@@ -14,6 +14,7 @@ environment variables.
 The component queries for current environment dispatching `environment-current` custom event.
 The event should be handled and values should be set within the same event loop.
 The handler must set `variables` property which is an array of variables with the following properties:
+
 ```javascript
 {
   enabled: true,
@@ -71,16 +72,13 @@ e.detail.result.then((value) => {
 
 ## Jexl dependency
 
-Previous versions of this component included Jexl library. This version do not have
-Jexl as a dependency but it is required to run the component.
+Previous versions of this component included Jexl library. This version do not have Jexl as a dependency but it is required to run the component.
 
-You must install [Jexl](https://github.com/TomFrost/Jexl) on your project, and build it for browser.
-See `dev-lib/` folder for an example of such build.
+You must install [Jexl](https://github.com/TomFrost/Jexl) on your project, and build it for browser. See `dev-lib/` folder for an example of such a build.
 
-Finally you have to either pass the pointer to Jexl library to `jexl` property
-or point to a pointer relative to the `window` object.
+Finally you have to either pass the pointer to Jexl library to `jexl` property or point to a relative in the `window` object.
 
-Setting Jexl pointer:
+Setting Jexl reference:
 
 ```javascript
 const eval = document.querySelector('variables-evaluator');
@@ -90,7 +88,7 @@ eval.jexl = myJexlVariable;
 Setting path to Jexl:
 
 ```html
-<variables-evaluator jexl-path="ArcVariables.JexlDev"></variables-evaluator>
+<variables-evaluator jexlpath="ArcVariables.JexlDev"></variables-evaluator>
 ```
 This expects the Jexl library to be under `window.ArcVariables.JexlDev` variable.
 
@@ -111,48 +109,58 @@ npm install --save @advanced-rest-client/variables-evaluator
 <html>
   <head>
     <script type="module">
-      import './node_odules/@advanced-rest-client/variables-evaluator/variables-evaluator.js';
+      import '@advanced-rest-client/variables-evaluator/variables-evaluator.js';
     </script>
+    <script src="jexl.min.js"></script>
   </head>
   <body>
-    <variables-evaluator></variables-evaluator>
+    <variables-evaluator jexlpath="jexl"></variables-evaluator>
   </body>
 </html>
 ```
 
-### In a Polymer 3 element
+### In a LitElement template
 
-```js
-import {PolymerElement, html} from './node_odules/@polymer/polymer';
-import './node_odules/@advanced-rest-client/variables-evaluator/variables-evaluator.js';
+```javascript
+import { LitElement, html } from 'lit-element';
+import '@advanced-rest-client/variables-evaluator/variables-evaluator.js';
 
-class SampleElement extends PolymerElement {
-  static get template() {
+class SampleElement extends LitElement {
+  render() {
     return html`
-    <variables-evaluator></variables-evaluator>
+    <variables-evaluator jexl="${this.jexlRef}"></variables-evaluator>
     `;
+  }
+
+  async evaluate() {
+    const node = this.shadowRoot.querySelector('variables-evaluator');
+    // clears previously set context and cache
+    node.reset();
+    const result = await element.evaluateVariable('some ${str}', {
+      str: 'value'
+    });
+    console.log(result); // some value
   }
 }
 customElements.define('sample-element', SampleElement);
 ```
 
-### Installation
+### development
 
 ```sh
 git clone https://github.com/advanced-rest-client/variables-evaluator
-cd api-url-editor
+cd variables-evaluator
 npm install
-npm install -g polymer-cli
 ```
 
 ### Running the demo locally
 
 ```sh
-polymer serve --npm
-open http://127.0.0.1:<port>/demo/
+npm start
 ```
 
 ### Running the tests
+
 ```sh
-polymer test --npm
+npm test
 ```

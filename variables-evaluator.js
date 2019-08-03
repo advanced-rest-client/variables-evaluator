@@ -11,9 +11,9 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import {PolymerElement} from '../../@polymer/polymer/polymer-element.js';
-import {EventsTargetMixin} from '../../@advanced-rest-client/events-target-mixin/events-target-mixin.js';
-import {VariablesContextBuilderMixin} from './variables-context-builder-mixin.js';
+import { LitElement } from 'lit-element';
+import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin/events-target-mixin.js';
+import { VariablesContextBuilderMixin } from './variables-context-builder-mixin.js';
 /**
  * `<variables-evaluator>` Variables evaluator for the Advanced REST Client
  *
@@ -68,16 +68,17 @@ import {VariablesContextBuilderMixin} from './variables-context-builder-mixin.js
  *
  * @memberof LogicElements
  * @customElement
- * @polymer
  * @demo demo/index.html
  * @appliesMixin VariablesContextBuilderMixin
  * @appliesMixin EventsTargetBehavior
  */
-class VariablesEvaluator extends EventsTargetMixin(VariablesContextBuilderMixin(PolymerElement)) {
+class VariablesEvaluator extends EventsTargetMixin(VariablesContextBuilderMixin(LitElement)) {
   static get properties() {
     return {
-      // If set it will not handle `before-request` event
-      noBeforeRequest: Boolean
+      /**
+       * If set it will not handle `before-request` event
+       */
+      noBeforeRequest: { type: Boolean }
     };
   }
 
@@ -85,6 +86,14 @@ class VariablesEvaluator extends EventsTargetMixin(VariablesContextBuilderMixin(
     super();
     this._beforeRequestHandler = this._beforeRequestHandler.bind(this);
     this._evaluateVariableHandler = this._evaluateVariableHandler.bind(this);
+  }
+
+  connectedCallback() {
+    /* istanbul ignore else */
+    if (super.connectedCallback) {
+      super.connectedCallback();
+    }
+    this.setAttribute('aria-hidden', 'true');
   }
 
   _attachListeners(node) {
@@ -101,6 +110,10 @@ class VariablesEvaluator extends EventsTargetMixin(VariablesContextBuilderMixin(
     if (this.noBeforeRequest) {
       return;
     }
+    const promises = e.detail.promises;
+    if (!(promises instanceof Array)) {
+      return;
+    }
     e.detail.promises.push(this.processBeforeRequest(e.detail));
   }
   /**
@@ -115,46 +128,35 @@ class VariablesEvaluator extends EventsTargetMixin(VariablesContextBuilderMixin(
    * the variable. Rest is added to the list.
    * @return {Promise} Promise resolved to a request object.
    */
-  processBeforeRequest(request, override) {
+  async processBeforeRequest(request, override) {
     if (!override) {
       if (request.config && request.config.variables) {
         override = request.config.variables;
       }
     }
-    return new Promise((resolve, reject) => {
-      this.cache = undefined;
-      this.context = undefined;
-      this._processBeforeRequest(request, override, resolve, reject);
-    });
+    this.reset();
+    return await this._processBeforeRequest(request, override);
   }
 
-  _processBeforeRequest(request, override, resolve, reject) {
+  async _processBeforeRequest(request, override) {
     let promise;
     if (this.context) {
-      promise = Promise.resolve(this.context);
+      promise = this.context;
     } else {
       promise = this.buildContext(override);
     }
-    return promise
-    .then((context) => {
-      const p = ['url', 'method', 'headers', 'payload']
-      .map((property) => {
-        if (!request[property]) {
-          return Promise.resolve();
-        }
-        return this.evaluateVariable(request[property], context)
-        .then(function(value) {
-          request[property] = value;
-        });
-      });
-      return Promise.all(p);
-    })
-    .then(function() {
-      resolve(request);
-    })
-    .catch(function(cause) {
-      reject(cause);
-    });
+
+    const context = await promise;
+    const props = ['url', 'method', 'headers', 'payload'];
+    for (let i = 0, len = props.length; i < len; i++) {
+      const property = props[i];
+      if (!request[property]) {
+        continue;
+      }
+      const value = await this.evaluateVariable(request[property], context);
+      request[property] = value;
+    }
+    return request;
   }
 
   _evaluateVariableHandler(e) {
@@ -163,18 +165,11 @@ class VariablesEvaluator extends EventsTargetMixin(VariablesContextBuilderMixin(
     }
     e.preventDefault();
     e.stopPropagation();
-    const {value, override, context} = e.detail;
-    e.detail.result = new Promise((resolve, reject) => {
-      this.cache = undefined;
-      this.context = undefined;
-      this._processVariableEvaluation(value, override, context, resolve, reject);
-    });
-  }
+    const { value, override, context } = e.detail;
 
-  _processVariableEvaluation(value, override, context, resolve, reject) {
-    return this.evaluateVariable(value, context, override)
-    .then((result) => resolve(result))
-    .catch((cause) => reject(cause));
+    this.cache = undefined;
+    this.context = undefined;
+    e.detail.result = this.evaluateVariable(value, context, override);
   }
 }
 window.customElements.define('variables-evaluator', VariablesEvaluator);
