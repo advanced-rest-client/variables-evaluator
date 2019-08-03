@@ -5,16 +5,18 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   variables-evaluator.html
+ *   variables-evaluator.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
 
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../events-target-behavior/events-target-behavior.d.ts" />
-/// <reference path="variables-context-builder-mixin.d.ts" />
+import {LitElement} from 'lit-element';
+
+import {EventsTargetMixin} from '@advanced-rest-client/events-target-mixin/events-target-mixin.js';
+
+import {VariablesContextBuilderMixin} from './variables-context-builder-mixin.js';
 
 declare namespace LogicElements {
 
@@ -71,19 +73,15 @@ declare namespace LogicElements {
    * This prevents double inclusion in Electron environment.
    */
   class VariablesEvaluator extends
-    ArcBehaviors.VariablesContextBuilderMixin(
-    ArcBehaviors.EventsTargetBehavior(
+    VariablesContextBuilderMixin(
+    EventsTargetBehavior(
     Object)) {
-
-    /**
-     * A cache object for groupping
-     */
-    cache: object|null|undefined;
 
     /**
      * If set it will not handle `before-request` event
      */
     noBeforeRequest: boolean|null|undefined;
+    connectedCallback(): void;
     _attachListeners(node: any): void;
     _detachListeners(node: any): void;
     _beforeRequestHandler(e: any): void;
@@ -101,30 +99,14 @@ declare namespace LogicElements {
      * @returns Promise resolved to a request object.
      */
     processBeforeRequest(request: object|null, override: object|null): Promise<any>|null;
-    _processBeforeRequest(request: any, override: any, resolve: any, reject: any): any;
+    _processBeforeRequest(request: any, override: any): any;
     _evaluateVariableHandler(e: any): void;
-    _processVariableEvaluation(value: any, resolve: any, reject: any): any;
-
-    /**
-     * Finds cached group.
-     *
-     * @param key A key where a function keeps cached objects
-     * @param group Group name. Defined by user as an argument.
-     * @returns Cached value.
-     */
-    _findInCache(key: String|null, group: String|null): String|null;
-
-    /**
-     * Stores value in cache.
-     *
-     * @param key A key where a function keeps cached objects
-     * @param group Group name. Defined by user as an argument.
-     * @param value Cached value.
-     */
-    _storeCache(key: String|null, group: String|null, value: String|null): void;
   }
 }
 
-interface HTMLElementTagNameMap {
-  "variables-evaluator": LogicElements.VariablesEvaluator;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "variables-evaluator": LogicElements.VariablesEvaluator;
+  }
 }

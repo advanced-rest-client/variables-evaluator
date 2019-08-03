@@ -1,4 +1,4 @@
-<!--
+/**
 @license
 Copyright 2018 The Advanced REST client authors <arc@mulesoft.com>
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -10,11 +10,10 @@ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
--->
-<link rel="import" href="../polymer/polymer-element.html">
-<link rel="import" href="../events-target-behavior/events-target-behavior.html">
-<link rel="import" href="variables-context-builder-mixin.html">
-<script>
+*/
+import { LitElement } from 'lit-element';
+import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin/events-target-mixin.js';
+import { VariablesContextBuilderMixin } from './variables-context-builder-mixin.js';
 /**
  * `<variables-evaluator>` Variables evaluator for the Advanced REST Client
  *
@@ -69,22 +68,17 @@ the License.
  *
  * @memberof LogicElements
  * @customElement
- * @polymer
  * @demo demo/index.html
- * @appliesMixin ArcBehaviors.VariablesContextBuilderMixin
- * @appliesMixin ArcBehaviors.EventsTargetBehavior
+ * @appliesMixin VariablesContextBuilderMixin
+ * @appliesMixin EventsTargetBehavior
  */
-class VariablesEvaluator extends ArcBehaviors.EventsTargetBehavior(
-  ArcBehaviors.VariablesContextBuilderMixin(Polymer.Element)) {
-  static get is() {
-    return 'variables-evaluator';
-  }
+class VariablesEvaluator extends EventsTargetMixin(VariablesContextBuilderMixin(LitElement)) {
   static get properties() {
     return {
-      // A cache object for groupping
-      cache: Object,
-      // If set it will not handle `before-request` event
-      noBeforeRequest: Boolean
+      /**
+       * If set it will not handle `before-request` event
+       */
+      noBeforeRequest: { type: Boolean }
     };
   }
 
@@ -92,6 +86,14 @@ class VariablesEvaluator extends ArcBehaviors.EventsTargetBehavior(
     super();
     this._beforeRequestHandler = this._beforeRequestHandler.bind(this);
     this._evaluateVariableHandler = this._evaluateVariableHandler.bind(this);
+  }
+
+  connectedCallback() {
+    /* istanbul ignore else */
+    if (super.connectedCallback) {
+      super.connectedCallback();
+    }
+    this.setAttribute('aria-hidden', 'true');
   }
 
   _attachListeners(node) {
@@ -108,6 +110,10 @@ class VariablesEvaluator extends ArcBehaviors.EventsTargetBehavior(
     if (this.noBeforeRequest) {
       return;
     }
+    const promises = e.detail.promises;
+    if (!(promises instanceof Array)) {
+      return;
+    }
     e.detail.promises.push(this.processBeforeRequest(e.detail));
   }
   /**
@@ -122,41 +128,35 @@ class VariablesEvaluator extends ArcBehaviors.EventsTargetBehavior(
    * the variable. Rest is added to the list.
    * @return {Promise} Promise resolved to a request object.
    */
-  processBeforeRequest(request, override) {
-    return new Promise((resolve, reject) => {
-      this.cache = undefined;
-      this.context = undefined;
-      this._processBeforeRequest(request, override, resolve, reject);
-    });
+  async processBeforeRequest(request, override) {
+    if (!override) {
+      if (request.config && request.config.variables) {
+        override = request.config.variables;
+      }
+    }
+    this.reset();
+    return await this._processBeforeRequest(request, override);
   }
 
-  _processBeforeRequest(request, override, resolve, reject) {
+  async _processBeforeRequest(request, override) {
     let promise;
     if (this.context) {
-      promise = Promise.resolve(this.context);
+      promise = this.context;
     } else {
       promise = this.buildContext(override);
     }
-    return promise
-    .then((context) => {
-      const p = ['url', 'method', 'headers', 'payload']
-      .map((property) => {
-        if (!request[property]) {
-          return Promise.resolve();
-        }
-        return this.evaluateVariable(request[property], context)
-        .then(function(value) {
-          request[property] = value;
-        });
-      });
-      return Promise.all(p);
-    })
-    .then(function() {
-      resolve(request);
-    })
-    .catch(function(cause) {
-      reject(cause);
-    });
+
+    const context = await promise;
+    const props = ['url', 'method', 'headers', 'payload'];
+    for (let i = 0, len = props.length; i < len; i++) {
+      const property = props[i];
+      if (!request[property]) {
+        continue;
+      }
+      const value = await this.evaluateVariable(request[property], context);
+      request[property] = value;
+    }
+    return request;
   }
 
   _evaluateVariableHandler(e) {
@@ -165,54 +165,11 @@ class VariablesEvaluator extends ArcBehaviors.EventsTargetBehavior(
     }
     e.preventDefault();
     e.stopPropagation();
-    e.detail.result = new Promise(function(value, resolve, reject) {
-      this.cache = undefined;
-      this.context = undefined;
-      this._processVariableEvaluation(value, resolve, reject);
-    }.bind(this, e.detail.value));
-  }
+    const { value, override, context } = e.detail;
 
-  _processVariableEvaluation(value, resolve, reject) {
-    return this.evaluateVariable(value)
-    .then(function(result) {
-      resolve(result);
-    })
-    .catch(function(cause) {
-      reject(cause);
-    });
-  }
-  /**
-   * Finds cached group.
-   *
-   * @param {String} key A key where a function keeps cached objects
-   * @param {String} group Group name. Defined by user as an argument.
-   * @return {String} Cached value.
-   */
-  _findInCache(key, group) {
-    if (!this.cache) {
-      return;
-    }
-    if (!this.cache[key]) {
-      return;
-    }
-    return this.cache[key][group];
-  }
-  /**
-   * Stores value in cache.
-   *
-   * @param {String} key A key where a function keeps cached objects
-   * @param {String} group Group name. Defined by user as an argument.
-   * @param {String} value Cached value.
-   */
-  _storeCache(key, group, value) {
-    if (!this.cache) {
-      this.cache = {};
-    }
-    if (!this.cache[key]) {
-      this.cache[key] = {};
-    }
-    this.cache[key][group] = value;
+    this.cache = undefined;
+    this.context = undefined;
+    e.detail.result = this.evaluateVariable(value, context, override);
   }
 }
-window.customElements.define(VariablesEvaluator.is, VariablesEvaluator);
-</script>
+window.customElements.define('variables-evaluator', VariablesEvaluator);
