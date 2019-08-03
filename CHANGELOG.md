@@ -185,3 +185,7 @@
 
 
 
+# [3.0.0](https://github.com/advanced-rest-client/variables-evaluator/compare/0.2.1...3.0.0) (2019-08-03)
+
+
+
