@@ -251,3 +251,57 @@ and https://github.com/advanced-rest-client/arc-electron/issues/121
  [09edd53](https://github.com/advanced-rest-client/variables-evaluator/commit/09edd534ec09943d4a325fd7c835f38926cb432d) by Pawel Psztyc
 
 
+<a name="3.1.0"></a>
+## [3.1.0](https://github.com/advanced-rest-client/variables-evaluator/compare/2.0.0...3.1.0) (2020-04-14)
+
+### Build
+
+* bumping version [e632835](https://github.com/advanced-rest-client/variables-evaluator/commit/e632835f3dd9a84302109e43f6c050ac3471ee86) by Pawel
+
+
+### Continuous integration
+
+* removing sudo from travis config [e368d35](https://github.com/advanced-rest-client/variables-evaluator/commit/e368d353d4254e945ad4964b1107281592f6b1f0) by Pawel
+
+
+### Update
+
+* upgrading demo page [030b1dc](https://github.com/advanced-rest-client/variables-evaluator/commit/030b1dce31c8e809b94b7ab2eb03a11bc261863f) by Pawel
+* moving sources to src/ folder [7ed459d](https://github.com/advanced-rest-client/variables-evaluator/commit/7ed459d32002404ecaf0d201ea05c53bcb5ee19f) by Pawel
+* upgrading dependencies [25656de](https://github.com/advanced-rest-client/variables-evaluator/commit/25656de636979c4ca1a094fdb85ff762629cff0b) by Pawel
+* [ci skip] automated merge master->stage. syncing main branches [8088a72](https://github.com/advanced-rest-client/variables-evaluator/commit/8088a7270ead54fc25f009db0dff1b6f5eaed601) by Ci agent
+* upgrading dependencies to fix audit errors [e7397ea](https://github.com/advanced-rest-client/variables-evaluator/commit/e7397eaed656bcba8c8b64dd6fc78af204b50a68) by Pawel Psztyc
+
+
+### Refactor
+
+* upgrading to final WC spec and LitElement [c5dd612](https://github.com/advanced-rest-client/variables-evaluator/commit/c5dd6126420451b7dfc2b3db62de65e4d8656c00) by Pawel
+
+
+### Testing
+
+* updated Travis configuration to connect to Sauce Labs [d03e3d0](https://github.com/advanced-rest-client/variables-evaluator/commit/d03e3d0b6f1ada1b0676892726d091d05e2f904f) by Pawel
+* updating SL test name [4a948e9](https://github.com/advanced-rest-client/variables-evaluator/commit/4a948e9e564dede7c756dc6ccaa63bbffa9e544f) by Pawel
+
+
+### Other
+
+* New: Adding integration with pica/web project
+ [a1a4785](https://github.com/advanced-rest-client/variables-evaluator/commit/a1a47851bc8a3a216a2b26dc319078a6ffcec766) by Pawel Psztyc
+* Update: Removing bower file
+ [c37d4c7](https://github.com/advanced-rest-client/variables-evaluator/commit/c37d4c777a0a9bea34b7df06dc21f543fef6f506) by Pawel Psztyc
+* Docs: Updating demp page's formatting
+ [2e0107f](https://github.com/advanced-rest-client/variables-evaluator/commit/2e0107fa24b9292f45f08d9a062650a5a2042dd0) by Pawel Psztyc
+* Update: removing jexl dev build and updating docs
+ [6e4f2dd](https://github.com/advanced-rest-client/variables-evaluator/commit/6e4f2dda8cf57899c063f0082115d9f9a244d91e) by Pawel
+* Docs: Updating docs
+ [9489ce1](https://github.com/advanced-rest-client/variables-evaluator/commit/9489ce1e2d8acc0106b2879139029ed01a3135c9) by Pawel
+* Update: Updating tests
+ [06f5c23](https://github.com/advanced-rest-client/variables-evaluator/commit/06f5c23ed637c65d7780264ca83a2ab8c17f63e9) by Pawel
+* New: Adding support for variables defined in request config
+
+Related to https://github.com/advanced-rest-client/arc-electron/issues/120
+and https://github.com/advanced-rest-client/arc-electron/issues/121
+ [c43d319](https://github.com/advanced-rest-client/variables-evaluator/commit/c43d319dab8c417ab842abf4c48f2e85a6ea8e03) by Pawel
+
+
