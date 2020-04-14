@@ -4,6 +4,7 @@
   "version": "3.0.0",
   "license": "Apache-2.0",
   "main": "variables-evaluator.js",
+  "module": "index.js",
   "keywords": [
     "web-components",
     "variables",

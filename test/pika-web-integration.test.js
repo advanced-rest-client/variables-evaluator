@@ -31,11 +31,9 @@ describe('@pika/web integration', function() {
       element = await basicFixture();
     });
 
-    it('Evaluates variable', function() {
-      return element.evaluateVariable('test ${test1}')
-      .then(function(result) {
-        assert.equal(result, 'test value1');
-      });
+    it('Evaluates variable', async () => {
+      const result = await element.evaluateVariable('test ${test1}');
+      assert.equal(result, 'test value1');
     });
   });
 });

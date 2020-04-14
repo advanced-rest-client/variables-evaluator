@@ -5,10 +5,12 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   variables-context-builder-mixin.js
+ *   index.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 
-export {VariablesContextBuilderMixin};
+export {VariablesEvaluator} from './src/VariablesEvaluator.js';
+
+export {VariablesMixin} from './src/VariablesMixin.js';
