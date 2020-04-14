@@ -1,13 +1,15 @@
 import { html } from 'lit-html';
-import { ArcDemoPage } from '@advanced-rest-client/arc-demo-helper/ArcDemoPage.js';
-import '@polymer/paper-button/paper-button.js';
+import { DemoPage } from '@advanced-rest-client/arc-demo-helper';
+import '@anypoint-web-components/anypoint-button/anypoint-button.js';
 import '../variables-evaluator.js';
 
-class ComponentDemo extends ArcDemoPage {
+class ComponentDemo extends DemoPage {
   constructor() {
     super();
-    this.initObservableProperties();
-    this._componentName = 'variables-evaluator';
+    this.initObservableProperties([
+      'vars', 'oVars', 'val', 'url', 'method', 'headers', 'payload', 'useEventsApi'
+    ]);
+    this.componentName = 'variables-evaluator';
     let vars = 'variable: my test value\notherVariable: other value\n';
     vars += 'urlParam: query\nurlParamValue: my+query\n';
     vars += 'token: my-access-token\nterm: PUT\n';
@@ -43,23 +45,6 @@ class ComponentDemo extends ArcDemoPage {
     this._useEventHandler = this._useEventHandler.bind(this);
     this._envRequestHandler = this._envRequestHandler.bind(this);
     window.addEventListener('environment-current', this._envRequestHandler);
-  }
-
-  initObservableProperties() {
-    [
-      'vars', 'oVars', 'val', 'url', 'method', 'headers', 'payload', 'useEventsApi'
-    ].forEach((item) => {
-      Object.defineProperty(this, item, {
-        get() {
-          return this['_' + item];
-        },
-        set(newValue) {
-          this._setObservableProperty(item, newValue);
-        },
-        enumerable: true,
-        configurable: true
-      });
-    });
   }
 
   get evalResult() {
@@ -219,7 +204,7 @@ class ComponentDemo extends ArcDemoPage {
             aria-labelledby="urlLabel"
             aria-describedby="urlDesc"
             .value="${url}"
-            @input="${this._urlHandler}"></textarea>
+            @input="${this._urlHandler}"/>
         </div>
         <div>
           <label for="methodInput" id="methodLabel">Request method</label>
@@ -287,7 +272,7 @@ class ComponentDemo extends ArcDemoPage {
             .value="${val}"
             @input="${this._valHandler}"></textarea>
         </div>`}
-      <paper-button raised @click="${this._evalHandler}">Evaluate</paper-button>
+      <anypoint-button emphasis="high" @click="${this._evalHandler}">Evaluate</anypoint-button>
     </fieldset>
 
     <div class="card">
