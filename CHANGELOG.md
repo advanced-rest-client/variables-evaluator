@@ -305,3 +305,38 @@ and https://github.com/advanced-rest-client/arc-electron/issues/121
  [c43d319](https://github.com/advanced-rest-client/variables-evaluator/commit/c43d319dab8c417ab842abf4c48f2e85a6ea8e03) by Pawel
 
 
+<a name="4.0.0"></a>
+# [4.0.0](https://github.com/advanced-rest-client/variables-evaluator/compare/3.0.0...4.0.0) (2020-05-07)
+
+## Build
+
+* bumping version [26c3f89](https://github.com/advanced-rest-client/variables-evaluator/commit/26c3f8952b77d9950434a27b437011cb374ac389) by Pawel
+* bumping version [e632835](https://github.com/advanced-rest-client/variables-evaluator/commit/e632835f3dd9a84302109e43f6c050ac3471ee86) by Pawel
+
+
+## Continuous integration
+
+* removing sudo from travis config [e368d35](https://github.com/advanced-rest-client/variables-evaluator/commit/e368d353d4254e945ad4964b1107281592f6b1f0) by Pawel
+
+
+## Update
+
+* [ci skip] automated merge master->stage. syncing main branches [c775828](https://github.com/advanced-rest-client/variables-evaluator/commit/c7758284b32732d52cdc632578f4347ff55387ed) by Ci agent
+* upgrading demo page [030b1dc](https://github.com/advanced-rest-client/variables-evaluator/commit/030b1dce31c8e809b94b7ab2eb03a11bc261863f) by Pawel
+* moving sources to src/ folder [7ed459d](https://github.com/advanced-rest-client/variables-evaluator/commit/7ed459d32002404ecaf0d201ea05c53bcb5ee19f) by Pawel
+* upgrading dependencies [25656de](https://github.com/advanced-rest-client/variables-evaluator/commit/25656de636979c4ca1a094fdb85ff762629cff0b) by Pawel
+* [ci skip] automated merge master->stage. syncing main branches [8088a72](https://github.com/advanced-rest-client/variables-evaluator/commit/8088a7270ead54fc25f009db0dff1b6f5eaed601) by Ci agent
+* upgrading dependencies to fix audit errors [e7397ea](https://github.com/advanced-rest-client/variables-evaluator/commit/e7397eaed656bcba8c8b64dd6fc78af204b50a68) by Pawel Psztyc
+
+
+## Refactor
+
+* refactoring mixin methods and moaking it more modular [e356746](https://github.com/advanced-rest-client/variables-evaluator/commit/e3567464e91afd16bdf1eb162cc871513e59dda8) by Pawel
+
+
+## Testing
+
+* updated Travis configuration to connect to Sauce Labs [d03e3d0](https://github.com/advanced-rest-client/variables-evaluator/commit/d03e3d0b6f1ada1b0676892726d091d05e2f904f) by Pawel
+* updating SL test name [4a948e9](https://github.com/advanced-rest-client/variables-evaluator/commit/4a948e9e564dede7c756dc6ccaa63bbffa9e544f) by Pawel
+
+
