@@ -14,6 +14,11 @@ the License.
 import { LitElement } from 'lit-element';
 import { EventsTargetMixin } from '@advanced-rest-client/events-target-mixin/events-target-mixin.js';
 import { VariablesMixin } from './VariablesMixin.js';
+
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-plusplus */
+/* eslint-disable no-continue */
+
 /**
  * `<variables-evaluator>` Variables evaluator for the Advanced REST Client
  *
@@ -66,18 +71,19 @@ import { VariablesMixin } from './VariablesMixin.js';
  * Node version can be installed from `npm install jexl --save`.
  * This prevents double inclusion in Electron environment.
  *
- * @customElement
  * @demo demo/index.html
- * @appliesMixin VariablesMixin
- * @appliesMixin EventsTargetMixin
+ * @mixes VariablesMixin
+ * @mixes EventsTargetMixin
  */
-export class VariablesEvaluator extends EventsTargetMixin(VariablesMixin(LitElement)) {
+export class VariablesEvaluator extends EventsTargetMixin(
+  VariablesMixin(LitElement)
+) {
   static get properties() {
     return {
       /**
        * If set it will not handle `before-request` event
        */
-      noBeforeRequest: { type: Boolean }
+      noBeforeRequest: { type: Boolean },
     };
   }
 
@@ -85,6 +91,7 @@ export class VariablesEvaluator extends EventsTargetMixin(VariablesMixin(LitElem
     super();
     this._beforeRequestHandler = this._beforeRequestHandler.bind(this);
     this._evaluateVariableHandler = this._evaluateVariableHandler.bind(this);
+    this.noBeforeRequest = false;
   }
 
   connectedCallback() {
@@ -95,32 +102,44 @@ export class VariablesEvaluator extends EventsTargetMixin(VariablesMixin(LitElem
     this.setAttribute('aria-hidden', 'true');
   }
 
+  /** @override */
   _attachListeners(node) {
     node.addEventListener('before-request', this._beforeRequestHandler);
     node.addEventListener('evaluate-variable', this._evaluateVariableHandler);
   }
 
+  /** @override */
   _detachListeners(node) {
     node.removeEventListener('before-request', this._beforeRequestHandler);
-    node.removeEventListener('evaluate-variable', this._evaluateVariableHandler);
+    node.removeEventListener(
+      'evaluate-variable',
+      this._evaluateVariableHandler
+    );
   }
 
+  /**
+   * Handler for the `before-request` event. It does nothing when `noBeforeRequest`
+   * is set.
+   *
+   * @param {CustomEvent} e
+   */
   _beforeRequestHandler(e) {
     if (this.noBeforeRequest) {
       return;
     }
-    const promises = e.detail.promises;
-    if (!(promises instanceof Array)) {
+    const { promises } = e.detail;
+    if (!Array.isArray(promises)) {
       return;
     }
     e.detail.promises.push(this.processBeforeRequest(e.detail));
   }
+
   /**
    * A function to call directly on the element to process request object on
    * before request event.
    *
    * @param {Object} request ARC request object to process.
-   * @param {Object} override Optional. If not set then it clears the context
+   * @param {Object=} override Optional. If not set then it clears the context
    * and builds new one. Map of key-value pars to override variables
    * or to add temporary variables to the context. Values for keys that
    * exists in variables array (the `variable` property) will update value of
@@ -128,13 +147,15 @@ export class VariablesEvaluator extends EventsTargetMixin(VariablesMixin(LitElem
    * @return {Promise} Promise resolved to a request object.
    */
   async processBeforeRequest(request, override) {
+    let doOverride = override;
     if (!override) {
-      if (request.config && request.config.variables) {
-        override = request.config.variables;
+      const { config = {} } = request;
+      if (config.variables) {
+        doOverride = config.variables;
       }
     }
     this.reset();
-    return await this._processBeforeRequest(request, override);
+    return this._processBeforeRequest(request, doOverride);
   }
 
   async _processBeforeRequest(request, override) {
@@ -158,6 +179,11 @@ export class VariablesEvaluator extends EventsTargetMixin(VariablesMixin(LitElem
     return request;
   }
 
+  /**
+   * Handler for the `evaluate-variable` event. It does nothing when the event is cancelled.
+   *
+   * @param {CustomEvent} e
+   */
   _evaluateVariableHandler(e) {
     if (e.defaultPrevented) {
       return;

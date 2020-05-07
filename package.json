@@ -29,56 +29,89 @@
     "email": "arc@mulesoft.com"
   },
   "dependencies": {
-    "@advanced-rest-client/events-target-mixin": "^3.1.1",
+    "@advanced-rest-client/events-target-mixin": "^3.2.0",
+    "@open-wc/dedupe-mixin": "^1.2.17",
+    "@types/jexl": "^2.2.0",
     "lit-element": "^2.3.1"
   },
   "devDependencies": {
-    "@advanced-rest-client/arc-demo-helper": "^2.1.3",
-    "@advanced-rest-client/eslint-config": "^1.1.5",
-    "@advanced-rest-client/prettier-config": "^0.1.0",
-    "@advanced-rest-client/testing-karma-sl": "^1.2.0",
-    "@babel/core": "^7.9.0",
-    "@babel/preset-env": "^7.9.5",
-    "@commitlint/cli": "^8.3.5",
-    "@commitlint/config-conventional": "^8.3.4",
-    "@open-wc/testing": "^2.5.11",
-    "@open-wc/testing-karma": "^3.3.12",
+    "@advanced-rest-client/arc-demo-helper": "^2.1.4",
+    "@advanced-rest-client/testing-karma-sl": "^1.3.1",
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@open-wc/eslint-config": "^2.0.0",
+    "@open-wc/testing": "^2.5.16",
+    "@open-wc/testing-karma": "^3.3.19",
     "@pika/web": "^0.6.1",
-    "@polymer/gen-typescript-declarations": "^1.6.2",
     "babel-plugin-minify-mangle-names": "^0.5.0",
     "browserify": "^16.5.1",
     "deepmerge": "^4.2.2",
-    "es-dev-server": "^1.46.2",
+    "es-dev-server": "^1.48.1",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
     "fs-extra": "^9.0.0",
     "husky": "^4.2.5",
     "jexl": "^2.2.2",
-    "karma": "^5.0.1",
-    "lint-staged": "^10.1.3",
+    "karma": "^5.0.5",
+    "lint-staged": "^10.2.2",
+    "prettier": "^2.0.5",
     "sinon": "^9.0.2",
-    "uglify-js": "^3.9.0"
+    "typescript": "^3.8.3",
+    "typescript-lit-html-plugin": "^0.9.0",
+    "uglify-js": "^3.9.2"
   },
   "scripts": {
-    "test": "karma start --coverage",
-    "update-types": "gen-typescript-declarations --deleteExisting --outDir .",
     "start": "es-dev-server --app-index demo/index.html --node-resolve --open --watch",
-    "lint:eslint": "eslint --ext .js,.html .",
-    "format:eslint": "eslint --ext .js,.html . --fix",
-    "lint:prettier": "prettier \"**/*.js\" --list-different || (echo '↑↑ these files are not prettier formatted ↑↑' && exit 1)",
-    "format:prettier": "prettier \"**/*.js\" --write",
+    "lint:eslint": "eslint --ext .js,.html . --ignore-path .gitignore",
+    "format:eslint": "eslint --ext .js,.html . --fix --ignore-path .gitignore",
+    "lint:prettier": "prettier \"**/*.js\" --check --ignore-path .gitignore",
+    "format:prettier": "prettier \"**/*.js\" --write --ignore-path .gitignore",
     "lint": "npm run lint:eslint && npm run lint:prettier",
     "format": "npm run format:eslint && npm run format:prettier",
+    "test": "karma start --coverage",
     "test:watch": "karma start --auto-watch=true --single-run=false",
-    "test:sl": "karma start karma.sl.config.js --coverage",
+    "test:sl": "karma start karma.sl.config.js --compatibility auto --coverage",
     "prepare": "pika-web && node dev-lib/prepare.js"
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix"
-    ]
   },
   "@pika/web": {
     "webDependencies": [
       "jexl/lib/Jexl.js"
+    ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "@open-wc/eslint-config",
+      "eslint-config-prettier"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "**/demo/**/*.js",
+          "**/demo/**/*.html"
+        ],
+        "rules": {
+          "no-console": "off",
+          "no-unused-expressions": "off",
+          "class-methods-use-this": "off",
+          "import/no-extraneous-dependencies": "off"
+        }
+      }
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "arrowParens": "avoid"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
     ]
   }
 }

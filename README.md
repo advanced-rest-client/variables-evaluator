@@ -1,12 +1,12 @@
 [![Published on NPM](https://img.shields.io/npm/v/@advanced-rest-client/variables-evaluator.svg)](https://www.npmjs.com/package/@advanced-rest-client/variables-evaluator)
 
-[![Build Status](https://travis-ci.org/advanced-rest-client/variables-evaluator.svg?branch=stage)](https://travis-ci.org/advanced-rest-client/variables-evaluator)
+[![Build Status](https://travis-ci.com/advanced-rest-client/variables-evaluator.svg)](https://travis-ci.com/advanced-rest-client/variables-evaluator)
 
 [![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/advanced-rest-client/variables-evaluator)
 
-## &lt;variables-evaluator&gt;
+## variables-evaluator
 
-Variables evaluator for the Advanced REST Client and API components.
+Variables evaluator for Advanced REST Client and API components.
 
 The element handles `evaluate-variable` custom event to evaluate a variable against current
 environment variables.

@@ -1,12 +1,14 @@
 import { assert } from '@open-wc/testing';
 import * as sinon from 'sinon';
-import { VariablesMixin } from '../index.js';
+import { VariablesMixin, EvalFunctions } from '../index.js';
+import { find, store } from '../src/Cache.js';
+
+/* eslint-disable no-template-curly-in-string */
 
 class VariablesClass extends VariablesMixin(Object) {
   constructor(opts = {}) {
     super();
     this.context = opts.context;
-    this.cache = opts.cache;
     this.jexlPath = opts.jexlPath;
     this.jexl = opts.jexl;
   }
@@ -16,81 +18,104 @@ class VariablesClass extends VariablesMixin(Object) {
   }
 }
 
-describe('VariablesMixin', function() {
+describe('VariablesMixin', () => {
   describe('reset()', () => {
     let instance;
-    beforeEach(async function() {
+    beforeEach(async () => {
       instance = new VariablesClass({
         jexlPath: 'ArcVariables.JexlDev',
         context: {},
-        cache: {},
       });
     });
 
-    it('clears context', function() {
+    it('clears context', () => {
       instance.reset();
       assert.isUndefined(instance.context);
     });
 
-    it('clears cache', function() {
+    it('calls clearCache()', () => {
+      const spy = sinon.spy(instance, 'clearCache');
       instance.reset();
-      assert.isUndefined(instance.cache);
+      assert.isTrue(spy.called);
+    });
+  });
+
+  describe('clearCache()', () => {
+    let instance;
+    beforeEach(async () => {
+      instance = new VariablesClass({
+        jexlPath: 'ArcVariables.JexlDev',
+        context: {},
+      });
+    });
+
+    it('removes cached values', () => {
+      store(instance, 'key', 'group', 'value');
+      instance.clearCache();
+      const result = find(instance, 'key', 'group');
+      assert.equal(result, null);
     });
   });
 
   describe('_setupJexl()', () => {
     let instance;
-    beforeEach(async function() {
+    beforeEach(async () => {
       instance = new VariablesClass({
-        jexlPath: 'ArcVariables.JexlDev'
+        jexlPath: 'ArcVariables.JexlDev',
       });
     });
 
     afterEach(() => {
+      // @ts-ignore
       delete window.varTestObj;
     });
 
-    it('returns undefined when no jexlPath', function() {
+    it('returns undefined when no jexlPath', () => {
       instance.jexlPath = undefined;
       const result = instance._setupJexl();
-      assert.isUndefined(result);
+      assert.equal(result, null);
     });
 
-    it('returns reference to a window object: no parts in path', function() {
+    it('returns reference to a window object: no parts in path', () => {
+      // @ts-ignore
       window.varTestObj = {};
       instance.jexlPath = 'varTestObj';
       const result = instance._setupJexl();
+      // @ts-ignore
       assert.isTrue(result === window.varTestObj);
     });
 
-    it('returns reference to a window object: parts in path', function() {
+    it('returns reference to a window object: parts in path', () => {
+      // @ts-ignore
       window.varTestObj = {
         path: {
           to: {
-            jexl: {}
-          }
-        }
+            jexl: {},
+          },
+        },
       };
       instance.jexlPath = 'varTestObj.path.to.jexl';
       const result = instance._setupJexl();
+      // @ts-ignore
       assert.isTrue(result === window.varTestObj.path.to.jexl);
     });
 
-    it('returns undefined when the path is incorrect', function() {
+    it('returns undefined when the path is incorrect', () => {
+      // @ts-ignore
       window.varTestObj = {
-        path: {}
+        path: {},
       };
       instance.jexlPath = 'varTestObj.path.to.jexl';
       const result = instance._setupJexl();
-      assert.isUndefined(result);
+      assert.equal(result, null);
     });
   });
 
-  describe('_callFn()', function() {
+  describe('_callFn()', () => {
     let instance;
-    beforeEach(async function() {
+    beforeEach(async () => {
       instance = new VariablesClass({
-        jexlPath: 'ArcVariables.JexlDev'
+        jexlPath: 'ArcVariables.JexlDev',
       });
     });
 
@@ -118,16 +143,18 @@ describe('VariablesMixin', function() {
       assert.isTrue(spy.called);
     });
 
-    it('Calls encodeURIComponent() function', () => {
-      const spy = sinon.spy(instance, '__evalFnEncodeURIComponent');
+    it('Calls EvalFunctions.EncodeURIComponent() function', () => {
+      const spy = sinon.spy(EvalFunctions, 'EncodeURIComponent');
       instance._callFn('encodeURIComponent', ['a']);
       assert.isTrue(spy.called);
+      spy.restore();
     });
 
-    it('Calls decodeURIComponent() function', () => {
-      const spy = sinon.spy(instance, '__evalFnDecodeURIComponent');
+    it('Calls EvalFunctions.DecodeURIComponent() function', () => {
+      const spy = sinon.spy(EvalFunctions, 'DecodeURIComponent');
       instance._callFn('decodeURIComponent', ['a']);
       assert.isTrue(spy.called);
+      spy.restore();
     });
 
     it('Calls Math.xxx() function', () => {
@@ -158,49 +185,55 @@ describe('VariablesMixin', function() {
     });
   });
 
-  describe('buildContext()', function() {
+  describe('buildContext()', () => {
     let instance;
 
-    const contextFactory = function(e) {
+    const contextFactory = e => {
       e.preventDefault();
-      e.detail.variables = [{
-        variable: 'test1',
-        value: 'value1',
-        enabled: true
-      }, {
-        variable: 'test2',
-        value: 'value2 ${test1}',
-        enabled: true
-      }, {
-        variable: 'test3',
-        value: 'value3 ${test4}',
-        enabled: true
-      }, {
-        variable: 'test4',
-        value: 'value4',
-        enabled: true
-      }, {
-        variable: 'test5',
-        value: 'value5',
-        enabled: false
-      }];
+      e.detail.variables = [
+        {
+          variable: 'test1',
+          value: 'value1',
+          enabled: true,
+        },
+        {
+          variable: 'test2',
+          value: 'value2 ${test1}',
+          enabled: true,
+        },
+        {
+          variable: 'test3',
+          value: 'value3 ${test4}',
+          enabled: true,
+        },
+        {
+          variable: 'test4',
+          value: 'value4',
+          enabled: true,
+        },
+        {
+          variable: 'test5',
+          value: 'value5',
+          enabled: false,
+        },
+      ];
     };
 
-    before(function() {
+    before(() => {
       window.addEventListener('environment-current', contextFactory);
     });
 
-    after(function() {
+    after(() => {
       window.removeEventListener('environment-current', contextFactory);
     });
 
-    beforeEach(async function() {
+    beforeEach(async () => {
       instance = new VariablesClass({
-        jexlPath: 'ArcVariables.JexlDev'
+        jexlPath: 'ArcVariables.JexlDev',
       });
     });
 
-    it('Should create a context', function() {
+    it('Should create a context', () => {
       return instance.buildContext();
     });
 
@@ -209,6 +242,7 @@ describe('VariablesMixin', function() {
         window.removeEventListener('environment-current', f);
         e.stopPropagation();
         e.preventDefault();
+        // @ts-ignore
         e.detail.variables = [];
       });
       const result = await instance.buildContext();
@@ -234,7 +268,7 @@ describe('VariablesMixin', function() {
     it('Override context values', async () => {
       const opts = {
         test1: 'ov1',
-        test2: 'ov2'
+        test2: 'ov2',
       };
       const context = await instance.buildContext(opts);
       assert.equal(context.test1, 'ov1');
@@ -246,7 +280,7 @@ describe('VariablesMixin', function() {
       const opts = {
         test1: 'ov1',
         test2: 'ov2',
-        newVar: 'new'
+        newVar: 'new',
       };
       const context = await instance.buildContext(opts);
       assert.equal(context.test1, 'ov1');

@@ -1,33 +1,41 @@
 import { fixture, assert } from '@open-wc/testing';
 import { Jexl } from '../web_modules/jexl/lib/Jexl.js';
-window.Jexl = Jexl;
 import '../variables-evaluator.js';
 
-describe('@pika/web integration', function() {
+/* eslint-disable no-template-curly-in-string */
+
+// @ts-ignore
+window.Jexl = Jexl;
+
+describe('@pika/web integration', () => {
   async function basicFixture() {
-    return await fixture(`<variables-evaluator jexlpath="ArcVariables.JexlDev"></variables-evaluator>`);
+    return fixture(
+      `<variables-evaluator jexlpath="ArcVariables.JexlDev"></variables-evaluator>`
+    );
   }
 
-  describe('evaluateVariable()', function() {
+  describe('evaluateVariable()', () => {
     let element;
-    const contextFactory = function(e) {
+    const contextFactory = e => {
       e.preventDefault();
-      e.detail.variables = [{
-        variable: 'test1',
-        value: 'value1',
-        enabled: true
-      }];
+      e.detail.variables = [
+        {
+          variable: 'test1',
+          value: 'value1',
+          enabled: true,
+        },
+      ];
     };
 
-    before(function() {
+    before(() => {
       window.addEventListener('environment-current', contextFactory);
     });
 
-    after(function() {
+    after(() => {
       window.removeEventListener('environment-current', contextFactory);
     });
 
-    beforeEach(async function() {
+    beforeEach(async () => {
       element = await basicFixture();
     });
 
