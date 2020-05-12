@@ -115,7 +115,6 @@ describe('VariablesMixin', () => {
     ].forEach(([src, value]) => {
       it(`${src}`, async () => {
         const result = await instance.evaluateVariable(src);
-        console.log(value);
         assert.equal(result, value);
       });
     });
