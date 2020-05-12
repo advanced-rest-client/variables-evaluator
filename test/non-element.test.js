@@ -174,15 +174,6 @@ describe('VariablesMixin', () => {
       assert.equal(spy.args[0][1], 'substr', 'function name is set');
       assert.typeOf(spy.args[0][2], 'array', 'arguments is set');
     });
-
-    it('Calls JSON.xxx() function', () => {
-      const spy = sinon.spy(instance, '_callNamespaceFunction');
-      instance._callFn('JSON.parse', ['{}']);
-      assert.isTrue(spy.called);
-      assert.equal(spy.args[0][0], 'JSON', 'namespace is set');
-      assert.equal(spy.args[0][1], 'parse', 'function name is set');
-      assert.deepEqual(spy.args[0][2], ['{}'], 'arguments is set');
-    });
   });
 
   describe('buildContext()', () => {

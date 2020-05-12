@@ -216,15 +216,6 @@ describe('<variables-evaluator>', () => {
       assert.equal(spy.args[0][1], 'substr', 'function name is set');
       assert.typeOf(spy.args[0][2], 'array', 'arguments is set');
     });
-
-    it('Calls JSON.xxx() function', () => {
-      const spy = sinon.spy(element, '_callNamespaceFunction');
-      element._callFn('JSON.parse', ['{}']);
-      assert.isTrue(spy.called);
-      assert.equal(spy.args[0][0], 'JSON', 'namespace is set');
-      assert.equal(spy.args[0][1], 'parse', 'function name is set');
-      assert.deepEqual(spy.args[0][2], ['{}'], 'arguments is set');
-    });
   });
 
   describe('_callNamespace() =>', () => {
@@ -423,6 +414,12 @@ describe('<variables-evaluator>', () => {
       const compare = "'test ' + val + ' test ' + val + ' test ' + val + ''";
       assert.equal(result, compare);
     });
+
+    it('prepares API literla syntax', () => {
+      const result = prepareValue('test {val} test {val} test {val}');
+      const compare = "'test ' + val + ' test ' + val + ' test ' + val + ''";
+      assert.equal(result, compare);
+    });
   });
 
   describe('evaluateVariable()', () => {
@@ -486,11 +483,10 @@ describe('<variables-evaluator>', () => {
       });
     });
 
-    it('Evaluates JSON string', () => {
-      const str = '{\n"v1":"${test1}",\n\t"v2": "${test2}"\n}';
-      return element.evaluateVariable(str).then(result => {
-        assert.equal(result, '{\n"v1":"value1",\n\t"v2": "value2 value1"\n}');
-      });
+    it('Evaluates JSON string', async () => {
+      const str = '{\n\t"v1":"${test1}",\n\t"v2": "${test2}"\n}';
+      const result = await element.evaluateVariable(str);
+      assert.equal(result, '{\n\t"v1":"value1",\n\t"v2": "value2 value1"\n}');
     });
 
     it('Should return value for complex variable', () => {
@@ -1094,16 +1090,28 @@ describe('<variables-evaluator>', () => {
       assert.equal(result, 'test');
     });
 
-    it('replaces value with context value', () => {
+    it('replaces value with context value (JS syntax)', () => {
       const result = applyArgumentsContext('${test}', {
         test: 'other',
       });
       assert.equal(result, 'other');
     });
 
-    it('returns expression value if no key in context', () => {
+    it('replaces value with context value (API syntax)', () => {
+      const result = applyArgumentsContext('{test}', {
+        test: 'other',
+      });
+      assert.equal(result, 'other');
+    });
+
+    it('returns expression value if no key in context (JS syntax)', () => {
       const result = applyArgumentsContext('${test}', {});
-      assert.equal(result, 'test');
+      assert.equal(result, '${test}');
+    });
+
+    it('returns expression value if no key in context (API syntax)', () => {
+      const result = applyArgumentsContext('{test}', {});
+      assert.equal(result, '{test}');
     });
   });
 

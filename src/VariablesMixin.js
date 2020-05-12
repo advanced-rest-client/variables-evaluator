@@ -24,7 +24,20 @@ the License.
 */
 
 /* eslint-disable no-await-in-loop */
-/* eslint-disable class-methods-use-this */ /* eslint-disable no-bitwise */
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-bitwise */
+/* eslint-disable no-continue */
+
+const varValueRe = /^[a-zA-Z0-9_]+$/;
+
+/**
+ * Chwecks whether passed value is a vaild variable name.
+ * @param {string} name Variable name
+ * @return {boolean} true if the passed name can be used as variable value.
+ */
+const isVaildName = name => {
+  return varValueRe.test(name);
+};
 
 /**
  * Overrides variables with passed values.
@@ -77,7 +90,7 @@ export const overrideContextPost = (context, override) => {
  * @return {String} Parsed value without old syntax.
  */
 export const updgradeLegacy = value => {
-  const reg = /\${(random|now):?([0-9]+)?}/gm;
+  const reg = /\$?{(random|now):?([0-9]+)?}/gm;
   const test = reg.test(value);
   if (!test) {
     return value;
@@ -104,6 +117,16 @@ export const updgradeLegacy = value => {
 };
 
 /**
+ * Wraps a passed value with `'{'` and `'}'` to be properly processed by Jexl.
+ * @param {string} value The value to wrap.
+ * @param {boolean} isJson Whether the passed string originally was a JSON string.
+ * @return {string} Valid for Jexl JSON string.
+ */
+const wrapJsonValue = (value, isJson) => {
+  return isJson ? `'{' + ${value} + '}'` : value;
+};
+
+/**
  * Replaces strings with quoted string and variables notation into
  * variables that Jexl understands.
  *
@@ -111,37 +134,54 @@ export const updgradeLegacy = value => {
  * @return {String} Proper syntax for Jexl
  */
 export const prepareValue = value => {
-  if (!value || String(value).indexOf('${') === -1) {
+  if (!value) {
     return value;
   }
-  value = value.replace(/'/g, "\\'");
-  const tokenizer = new VariablesTokenizer(value);
+  let typedValue = String(value);
+  const isJsonValue =
+    typedValue[0] === '{' && typedValue[typedValue.length - 1] === '}';
+  if (isJsonValue) {
+    typedValue = typedValue.substr(1, typedValue.length - 2);
+  }
+  const isJSLiteral = typedValue.includes('${');
+  const isAPILiteral = !isJSLiteral && typedValue.includes('{');
+  if (!isJSLiteral && !isAPILiteral) {
+    return value;
+  }
+  typedValue = typedValue.replace(/'/g, "\\'");
+  const tokenizer = new VariablesTokenizer(typedValue);
   let parsed = '';
   const loopTest = true;
+  const prefix = isJSLiteral ? '$' : '{';
   while (loopTest) {
     const _startIndex = tokenizer.index;
-    const left = tokenizer.nextUntil('$');
+    const left = tokenizer.nextUntil(prefix);
     if (left === null) {
       // no more variables
       if (!parsed) {
-        return value;
+        return wrapJsonValue(typedValue, isJsonValue);
       }
       tokenizer.index = _startIndex;
       parsed += `'${tokenizer.eof()}'`;
-      return parsed;
+      return wrapJsonValue(parsed, isJsonValue);
     }
     let variable = tokenizer.nextUntil('}');
     if (!variable) {
       throw new Error('Syntax error. Unclosed curly bracket.');
     }
-    variable = variable.substr(1);
+    if (!isAPILiteral) {
+      variable = variable.substr(1);
+    }
+    if (!isVaildName(variable)) {
+      continue;
+    }
     const replacement = ` + ${variable} + `;
     let newValue = '';
     newValue += `'${left}'`;
     newValue += replacement;
     parsed += newValue;
   }
-  return value;
+  return wrapJsonValue(typedValue, isJsonValue);
 };
 
 /**
@@ -151,6 +191,9 @@ export const prepareValue = value => {
  */
 export const prepareMultilineValue = lines => {
   return lines.map(line => {
+    if (['{', '}'].includes(line.trim())) {
+      return line;
+    }
     let _res = prepareValue(line);
     if (_res === line) {
       _res = _res.replace(/'/g, "\\'");
@@ -162,13 +205,31 @@ export const prepareMultilineValue = lines => {
 };
 
 export const applyArgumentsContext = (arg, context) => {
-  if (String(arg).indexOf('${') === 0) {
-    arg = arg.substr(2, arg.length - 3);
-    if (context[arg]) {
-      return context[arg];
+  const typedValue = String(arg);
+  const jSLiteralIndex = typedValue.indexOf('${');
+  const apiLiteralIndex = typedValue.indexOf('{');
+  if (jSLiteralIndex === 0 || apiLiteralIndex === 0) {
+    const index = jSLiteralIndex === 0 ? 2 : 1;
+    const postIndex = jSLiteralIndex === 0 ? 3 : 2;
+    const varName = arg.substr(index, arg.length - postIndex);
+    if (isVaildName(varName) && context[varName]) {
+      return context[varName];
     }
   }
   return arg;
+};
+
+/**
+ * function that tests whether a passed variable contains a variable.
+ * @param {Variable} item The variable to test its value for variables.
+ * @return {boolean} True when the variable has another variable in the value.
+ */
+export const filterToEval = item => {
+  const { value } = item;
+  const typedValue = String(value);
+  const isJSLiteral = typedValue.includes('${');
+  const isAPILiteral = !isJSLiteral && typedValue.includes('{');
+  return isJSLiteral || isAPILiteral;
 };
 
 /**
@@ -204,7 +265,7 @@ const mxFunction = base => {
       /**
        * @type {RegExp}
        */
-      this.functionRegex = /(?:\${)?([.a-zA-Z0-9_-]+)\(([^)]*)?\)(?:})?/gm;
+      this.functionRegex = /(?:\$?{)?([.a-zA-Z0-9_-]+)\(([^)]*)?\)(?:})?/gm;
       /**
        * @type {string}
        */
@@ -315,9 +376,7 @@ const mxFunction = base => {
       runCount
     ) {
       if (!requireEvaluation) {
-        requireEvaluation = variables.filter(
-          item => String(item.value).indexOf('${') !== -1
-        );
+        requireEvaluation = variables.filter(filterToEval);
       }
       variables.forEach(item => {
         result[item.variable] = item.value;
@@ -334,9 +393,7 @@ const mxFunction = base => {
         item.value = value;
       }
 
-      requireEvaluation = requireEvaluation.filter(
-        item => String(item.value).indexOf('${') !== -1
-      );
+      requireEvaluation = requireEvaluation.filter(filterToEval);
       runCount = runCount || 1;
       if (requireEvaluation.length === 0 || runCount >= 2) {
         this.context = result;
@@ -365,11 +422,11 @@ const mxFunction = base => {
     /**
      * Evaluates a value against a variables.
      *
-     * @param {String} value A value to evaluate
+     * @param {string} value A value to evaluate
      * @param {Object=} context Optional. Context for Jexl. If not set it will
      * get a context from variables manager.
      * @param {Object=} override A list of variables to override in created context.
-     * @return {Promise} Promise that resolves to evaluated value.
+     * @return {Promise<string>} Promise that resolves to evaluated value.
      */
     async evaluateVariable(value, context, override) {
       const typeOf = typeof value;
@@ -380,19 +437,18 @@ const mxFunction = base => {
       if (typeOf !== 'string') {
         value = String(value);
       }
-      let promise;
+      let result;
       context = context || this.context;
       if (context) {
         if (override) {
           context = overrideContextPost(context, override);
-          promise = this._processContextVariablesPost(context);
+          result = await this._processContextVariablesPost(context);
         } else {
-          promise = context;
+          result = context;
         }
       } else {
-        promise = this.buildContext(override);
+        result = await this.buildContext(override);
       }
-      const result = await promise;
       return this.evaluateWithContext(result, value);
     }
 
@@ -400,12 +456,18 @@ const mxFunction = base => {
      * Evaluates a value with context passed to Jexl.
      * @param {Object} context Jexl's context
      * @param {string} value Value to evaluate
-     * @return {Promise} [description]
+     * @return {Promise}
      */
     async evaluateWithContext(context, value) {
       value = updgradeLegacy(value);
       value = this._evalFunctions(value);
-      if (!value || String(value).indexOf('${') === -1) {
+      if (!value) {
+        return value;
+      }
+      const typedValue = String(value);
+      const isJSLiteral = typedValue.includes('${');
+      const isAPILiteral = !isJSLiteral && typedValue.includes('{');
+      if (!isJSLiteral && !isAPILiteral) {
         return value;
       }
       let result;
@@ -431,7 +493,11 @@ const mxFunction = base => {
         const items = [];
         for (let i = 0, len = result.length; i < len; i++) {
           const item = result[i];
-          items[items.length] = await jexl.eval(item, context);
+          if (['{', '}'].includes(item.trim())) {
+            items[items.length] = item;
+          } else {
+            items[items.length] = await jexl.eval(item, context);
+          }
         }
         return items.join('\n');
       }
@@ -503,7 +569,7 @@ const mxFunction = base => {
       if (dotIndex !== -1) {
         const namespace = fnName.substr(0, dotIndex);
         const name = fnName.substr(dotIndex + 1);
-        if (['Math', 'String', 'JSON'].indexOf(namespace) !== -1) {
+        if (['Math', 'String'].indexOf(namespace) !== -1) {
           try {
             return this._callNamespaceFunction(namespace, name, args);
           } catch (e) {
