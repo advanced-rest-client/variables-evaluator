@@ -92,10 +92,6 @@ Setting path to Jexl:
 ```
 This expects the Jexl library to be under `window.ArcVariables.JexlDev` variable.
 
-### API components
-
-This components is a part of [API components ecosystem](https://elements.advancedrestclient.com/)
-
 ## Usage
 
 ### Installation
@@ -145,7 +141,7 @@ class SampleElement extends LitElement {
 customElements.define('sample-element', SampleElement);
 ```
 
-### development
+## Development
 
 ```sh
 git clone https://github.com/advanced-rest-client/variables-evaluator
