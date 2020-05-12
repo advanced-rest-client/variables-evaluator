@@ -340,3 +340,38 @@ and https://github.com/advanced-rest-client/arc-electron/issues/121
 * updating SL test name [4a948e9](https://github.com/advanced-rest-client/variables-evaluator/commit/4a948e9e564dede7c756dc6ccaa63bbffa9e544f) by Pawel
 
 
+<a name="4.0.1"></a>
+## [4.0.1](https://github.com/advanced-rest-client/variables-evaluator/compare/3.1.0...4.0.1) (2020-05-12)
+
+### Build
+
+* bumping version [1f09cf3](https://github.com/advanced-rest-client/variables-evaluator/commit/1f09cf309c0b5a8a32b76ed8abd91f9d3f03bcf6) by Pawel
+* bumping version [26c3f89](https://github.com/advanced-rest-client/variables-evaluator/commit/26c3f8952b77d9950434a27b437011cb374ac389) by Pawel
+
+
+### Update
+
+* [ci skip] automated merge master->stage. syncing main branches [8ac94e7](https://github.com/advanced-rest-client/variables-evaluator/commit/8ac94e7fbb9e9b73263b4cb084a2fd6c243ec591) by Ci agent
+* [ci skip] automated merge master->stage. syncing main branches [c775828](https://github.com/advanced-rest-client/variables-evaluator/commit/c7758284b32732d52cdc632578f4347ff55387ed) by Ci agent
+
+
+### Documentation
+
+* updating readme page [51202b9](https://github.com/advanced-rest-client/variables-evaluator/commit/51202b91d536e728cfa10821c1f4bcf3ed1bf59e) by Pawel
+
+
+### Bug Fixes
+
+* fixes #5 - adding support for `{name}` syntax [c0e1de4](https://github.com/advanced-rest-client/variables-evaluator/commit/c0e1de46ede5bf5d73917b8ada9febc690925fc6) by Pawel
+
+
+### Refactor
+
+* refactoring mixin methods and moaking it more modular [e356746](https://github.com/advanced-rest-client/variables-evaluator/commit/e3567464e91afd16bdf1eb162cc871513e59dda8) by Pawel
+
+
+### Testing
+
+* removing console statemenent [2c3c624](https://github.com/advanced-rest-client/variables-evaluator/commit/2c3c624a2cee1e288484fed4205fdcd63d44597d) by Pawel
+
+
